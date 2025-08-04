@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { connectToDatabase } from './mongo.js';
-import { User as ClientUser, UserRole } from '../types';
+import { User as ClientUser, UserRole } from '../types.js';
 import { ObjectId } from 'mongodb';
 
 interface UserInDb {
@@ -12,9 +12,9 @@ interface UserInDb {
     assignedCriteriaIds?: string[];
 }
 
-export interface AuthenticatedRequest extends VercelRequest {
+export type AuthenticatedRequest = VercelRequest & {
     user: ClientUser;
-}
+};
 
 type ApiHandler = (req: AuthenticatedRequest, res: VercelResponse) => Promise<void> | void;
 

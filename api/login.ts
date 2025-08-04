@@ -2,7 +2,7 @@
 
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { connectToDatabase } from './mongo.js';
-import { User, UserRole } from '../types';
+import { User, UserRole } from '../types.js';
 import { ObjectId } from 'mongodb';
 
 export default async (req: VercelRequest, res: VercelResponse) => {

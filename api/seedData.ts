@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { UserRole } from '../types';
+import { UserRole } from '../types.js';
 
 // This data will be automatically inserted into the database on the first run.
 // Unique IDs and passwords are set here.
