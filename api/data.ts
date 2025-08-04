@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { connectToDatabase } from './mongo';
-import { initialUsers, initialPosts } from './seedData';
+import { connectToDatabase } from './mongo.js';
+import { initialUsers, initialPosts } from './seedData.js';
 import { WithId } from 'mongodb';
 
 // Helper to ensure _id is converted to string id

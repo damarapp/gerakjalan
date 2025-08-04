@@ -1,7 +1,7 @@
 import { VercelResponse } from '@vercel/node';
-import { connectToDatabase } from './mongo';
+import { connectToDatabase } from './mongo.js';
 import { ObjectId } from 'mongodb';
-import { withAuth, AuthenticatedRequest } from './auth';
+import { withAuth, AuthenticatedRequest } from './auth.js';
 import { UserRole } from '../types';
 
 const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<void> => {

@@ -1,7 +1,7 @@
 import { VercelResponse } from '@vercel/node';
-import { connectToDatabase } from './mongo';
+import { connectToDatabase } from './mongo.js';
 import { Score, UserRole } from '../types';
-import { withAuth, AuthenticatedRequest } from './auth';
+import { withAuth, AuthenticatedRequest } from './auth.js';
 
 const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<void> => {
     if (req.method !== 'POST') {
