@@ -39,9 +39,6 @@ const LandingPage: React.FC = () => {
                         <Link to="/leaderboard" className="bg-putih text-merah font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-200 transition-transform transform hover:scale-105 flex items-center gap-2">
                            <Trophy size={20} /> Lihat Papan Skor
                         </Link>
-                        <Link to="/login" className="bg-transparent border-2 border-putih text-putih font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-putih hover:text-merah transition-all flex items-center gap-2">
-                           <UserCheck size={20} /> Login Juri/Admin
-                        </Link>
                     </div>
                 </div>
             </div>
