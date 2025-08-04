@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
 import { TeamLevel, TeamGender, TeamTotalScore } from '../../types';
 import Card from '../../components/Card';
-import { Trophy, Award, Medal, ArrowRight, ShieldCheck, UserCheck } from 'lucide-react';
+import Header from '../../components/Header';
+import { Trophy, Award, Medal } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
     const { calculateScores, scores, teams } = useAppContext();
@@ -27,13 +27,16 @@ const LandingPage: React.FC = () => {
 
     return (
         <div className="bg-abu-abu min-h-screen">
+            <Header />
             {/* Hero Section */}
-            <div className="relative bg-merah text-putih text-center py-20 md:py-32 px-4 overflow-hidden">
+            <div className="relative bg-merah text-putih text-center py-20 md:py-24 px-4 overflow-hidden">
                 <div className="absolute inset-0 bg-merah-tua opacity-50 transform -skew-y-3"></div>
                 <div className="relative z-10">
-                    <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">E-Penilaian Gerak Jalan</h1>
-                    <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-                        Sistem Penilaian Modern, Real-time, dan Transparan untuk Lomba Gerak Jalan Kemerdekaan.
+                    <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+                       Penilaian Modern, Real-time & Transparan
+                    </h2>
+                    <p className="mt-4 text-lg md:text-xl max-w-3xl mx-auto">
+                        Selamat datang di sistem E-Penilaian untuk Lomba Gerak Jalan Kemerdekaan. Lihat skor langsung atau login untuk memulai penilaian.
                     </p>
                     <div className="mt-8 flex justify-center gap-4 flex-wrap">
                         <Link to="/leaderboard" className="bg-putih text-merah font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-200 transition-transform transform hover:scale-105 flex items-center gap-2">
@@ -84,7 +87,7 @@ const LandingPage: React.FC = () => {
                 </Card>
             </div>
              <footer className="text-center py-6 text-abu-abu-gelap">
-                <p>&copy; {new Date().getFullYear()} Panitia Lomba Gerak Jalan. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} KKG PJOK Gondangwetan. All rights reserved.</p>
             </footer>
         </div>
     );

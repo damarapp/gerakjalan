@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import Card from '../../components/Card';
-import { Trophy, Award, Medal, Home } from 'lucide-react';
+import { Trophy, Award, Medal, Home, LogIn } from 'lucide-react';
 import { TeamTotalScore, TeamLevel, TeamGender } from '../../types';
 import { Link } from 'react-router-dom';
 
@@ -35,10 +34,16 @@ const PublicLeaderboard: React.FC = () => {
                         Papan Skor Langsung
                     </h1>
                 </Link>
-                <Link to="/" className="bg-putih text-merah hover:bg-gray-200 transition-colors duration-200 font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
-                   <Home size={18} />
-                   <span className="hidden md:inline">Kembali ke Depan</span>
-                </Link>
+                <div className="flex items-center gap-4">
+                    <Link to="/" className="bg-putih text-merah hover:bg-gray-200 transition-colors duration-200 font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                       <Home size={18} />
+                       <span className="hidden md:inline">Kembali ke Depan</span>
+                    </Link>
+                     <Link to="/login" className="bg-putih text-merah hover:bg-gray-200 transition-colors duration-200 font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                       <LogIn size={18} />
+                       <span className="hidden md:inline">Login</span>
+                    </Link>
+                </div>
             </div>
        </header>
         <div className="container mx-auto p-4 md:p-8">
@@ -87,7 +92,7 @@ const PublicLeaderboard: React.FC = () => {
           </Card>
         </div>
          <footer className="text-center py-6 text-abu-abu-gelap">
-            <p>&copy; {new Date().getFullYear()} Panitia Lomba Gerak Jalan. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} KKG PJOK Gondangwetan. All rights reserved.</p>
         </footer>
     </div>
   );
