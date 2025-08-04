@@ -17,6 +17,10 @@ const ReportPage: React.FC = () => {
             categories.push({ level, gender });
         });
     });
+    
+    // Define a canonical order for posts to ensure consistent column display
+    const postDisplayOrder = ["Pos Keberangkatan", "Pos Tengah", "Pos Finish"];
+
 
     return (
         <Card className="printable-card">
@@ -38,6 +42,10 @@ const ReportPage: React.FC = () => {
                 {categories.map(({ level, gender }) => {
                     const rankedScores = calculateScores({ level, gender });
                     
+                    if (rankedScores.length === 0) {
+                        return null;
+                    }
+
                     const judgesWithPosts = users.filter(u => u.role === UserRole.JUDGE && u.assignedPostId);
                     const groupedJudgesByPost = judgesWithPosts.reduce((acc, judge) => {
                         const postId = judge.assignedPostId!;
@@ -52,11 +60,18 @@ const ReportPage: React.FC = () => {
                         return acc;
                     }, {} as Record<string, { postName: string; judges: {id: string; name: string}[] }>);
 
-                    const postOrder = Object.keys(groupedJudgesByPost);
+                    // Sort the post IDs based on the canonical order defined above
+                    const postOrder = Object.keys(groupedJudgesByPost).sort((a, b) => {
+                        const postA = posts.find(p => p.id === a);
+                        const postB = posts.find(p => p.id === b);
+                        const indexA = postDisplayOrder.indexOf(postA?.name || '');
+                        const indexB = postDisplayOrder.indexOf(postB?.name || '');
+                        // Handle cases where a post name might not be in the display order
+                        if (indexA === -1) return 1;
+                        if (indexB === -1) return -1;
+                        return indexA - indexB;
+                    });
 
-                    if (rankedScores.length === 0) {
-                        return null;
-                    }
 
                     return (
                         <div key={`${level}-${gender}`} className="page-break-before">

@@ -1,8 +1,14 @@
 import { ObjectId } from 'mongodb';
 import { UserRole } from '../types';
 
-// Data ini akan dimasukkan secara otomatis ke database saat pertama kali dijalankan.
-// ID unik dan kata sandi sudah diatur di sini.
+// This data will be automatically inserted into the database on the first run.
+// Unique IDs and passwords are set here.
+// Post IDs are manually defined as fixed strings and referenced in the user data
+// to ensure a consistent link between judges and their assigned posts.
+
+const post1Id = "665f12a3b4c5d6e7f8a9b0d1";
+const post2Id = "665f12a3b4c5d6e7f8a9b0d2";
+const post3Id = "665f12a3b4c5d6e7f8a9b0d3";
 
 export const initialUsers = [
   {
@@ -16,7 +22,7 @@ export const initialUsers = [
     name: "Ahmad Fauzi",
     role: UserRole.JUDGE,
     password: "juri",
-    assignedPostId: "665f12a3b4c5d6e7f8a9b0d1", // ID ini harus cocok dengan salah satu ID di initialPosts
+    assignedPostId: post1Id,
     assignedCriteriaIds: ["c1", "c2"]
   },
   {
@@ -24,7 +30,7 @@ export const initialUsers = [
     name: "Siti Aminah",
     role: UserRole.JUDGE,
     password: "juri",
-    assignedPostId: "665f12a3b4c5d6e7f8a9b0d2", // ID ini harus cocok dengan salah satu ID di initialPosts
+    assignedPostId: post2Id,
     assignedCriteriaIds: ["c3", "c4"]
   },
   {
@@ -32,7 +38,7 @@ export const initialUsers = [
     name: "Budi Santoso",
     role: UserRole.JUDGE,
     password: "juri",
-    assignedPostId: "665f12a3b4c5d6e7f8a9b0d3", // ID ini harus cocok dengan salah satu ID di initialPosts
+    assignedPostId: post3Id,
     assignedCriteriaIds: ["c5", "c6"]
   },
   {
@@ -40,14 +46,14 @@ export const initialUsers = [
     name: "Rina Marlina",
     role: UserRole.JUDGE,
     password: "juri",
-    assignedPostId: "665f12a3b4c5d6e7f8a9b0d1", // ID ini harus cocok dengan salah satu ID di initialPosts
+    assignedPostId: post1Id,
     assignedCriteriaIds: ["c1", "c2"]
   }
 ];
 
 export const initialPosts = [
   {
-    _id: new ObjectId("665f12a3b4c5d6e7f8a9b0d1"),
+    _id: new ObjectId(post1Id),
     name: "Pos Keberangkatan",
     criteria: [
       { id: "c1", name: "Kerapihan Barisan", maxScore: 100 },
@@ -55,7 +61,7 @@ export const initialPosts = [
     ]
   },
   {
-    _id: new ObjectId("665f12a3b4c5d6e7f8a9b0d2"),
+    _id: new ObjectId(post2Id),
     name: "Pos Tengah",
     criteria: [
       { id: "c3", name: "Kekompakan Gerak", maxScore: 100 },
@@ -63,7 +69,7 @@ export const initialPosts = [
     ]
   },
   {
-    _id: new ObjectId("665f12a3b4c5d6e7f8a9b0d3"),
+    _id: new ObjectId(post3Id),
     name: "Pos Finish",
     criteria: [
       { id: "c5", name: "Ketahanan Fisik", maxScore: 100 },
@@ -71,13 +77,3 @@ export const initialPosts = [
     ]
   }
 ];
-
-// Kita perlu mereferensikan ID posts di dalam data users, jadi kita set manual ID untuk posts dan referensikan di users
-const pos1Id = initialPosts[0]._id.toString();
-const pos2Id = initialPosts[1]._id.toString();
-const pos3Id = initialPosts[2]._id.toString();
-
-initialUsers[1].assignedPostId = pos1Id;
-initialUsers[2].assignedPostId = pos2Id;
-initialUsers[3].assignedPostId = pos3Id;
-initialUsers[4].assignedPostId = pos1Id;
