@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Penilaian Gerak Jalan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'merah': '#DC2626',
+              'putih': '#FFFFFF',
+              'merah-tua': '#B91C1C',
+              'abu-abu': '#F3F4F6',
+              'abu-abu-gelap': '#4B5563',
+            },
+          }
+        }
+      }
+    </script>
+    <style>
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+        body {
+          background-color: #fff !important;
+        }
+        .printable-card {
+           box-shadow: none !important;
+           border: none !important;
+        }
+      }
+    </style>
+    <script type="module" src="https://unpkg.com/lucide-react@0.378.0/dist/esm/lucide-react.js"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.536.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "react": "https://esm.sh/react@^19.1.1",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.7.1",
+    "mongodb": "https://esm.sh/mongodb@^6.18.0",
+    "@vercel/node": "https://esm.sh/@vercel/node@^5.3.10"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-abu-abu">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

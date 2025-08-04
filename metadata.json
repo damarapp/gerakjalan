@@ -1,0 +1,6 @@
+{
+  "name": "E-Penilaian Gerak Jalan",
+  "description": "A web application to facilitate scoring for the Indonesian Independence Day marching competition, allowing for real-time score input by judges and automated ranking by administrators.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
