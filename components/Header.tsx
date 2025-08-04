@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { LogOut, Crown } from 'lucide-react';
 
@@ -13,14 +14,14 @@ const Header: React.FC = () => {
   return (
     <header className="bg-merah shadow-md no-print">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <div className="flex items-center space-x-2">
+        <Link to="/" className="flex items-center space-x-2">
            <div className="bg-putih p-2 rounded-full">
              <Crown className="text-merah" size={24} />
            </div>
            <h1 className="text-xl md:text-2xl font-bold text-putih">
             E-Penilaian Gerak Jalan
            </h1>
-        </div>
+        </Link>
         {currentUser && (
           <div className="flex items-center space-x-4">
             <span className="text-putih hidden sm:block">

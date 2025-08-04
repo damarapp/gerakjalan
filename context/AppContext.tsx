@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useReducer, useEffect, useCallback, ReactNode } from 'react';
 import { 
     User, Team, Post, Score, UserRole, 
@@ -110,14 +111,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [state, dispatch] = useReducer(appReducer, initialState);
 
     const apiCall = useCallback(async (url: string, options: RequestInit = {}) => {
-        const headers = { ...options.headers, 'Content-Type': 'application/json' };
+        const headers = new Headers(options.headers);
+        headers.set('Content-Type', 'application/json');
         
         // Add Authorization header if a user is logged in
         const storedUserStr = localStorage.getItem('currentUser');
         if (storedUserStr) {
             const user: User = JSON.parse(storedUserStr);
             if(user.id) { // Use the main ID which is the mongo _id
-                headers['Authorization'] = `Bearer ${user.id}`;
+                headers.set('Authorization', `Bearer ${user.id}`);
             }
         }
 
@@ -156,13 +158,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }, [fetchData]);
 
     const login = useCallback(async (role: UserRole, userId: string, password?: string) => {
-        if (role === UserRole.PUBLIC) {
-            const publicUser: User = { id: 'public_user', name: 'Guest', role: UserRole.PUBLIC };
-            dispatch({ type: 'LOGIN_SUCCESS', payload: publicUser });
-            localStorage.setItem('currentUser', JSON.stringify(publicUser));
-            return;
-        }
-
         const { user } = await apiCall('/api/login', {
             method: 'POST',
             body: JSON.stringify({ role, userId, password }),

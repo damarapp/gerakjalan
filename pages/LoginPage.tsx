@@ -19,20 +19,14 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-        if (role === UserRole.PUBLIC) {
-            // For public, we can simulate a login without API call or create a guest user
-            // This part can be adjusted based on final requirements for public view
-             await login(UserRole.PUBLIC, 'public', 'public'); // This is a mock, won't hit the DB
-        } else {
-            const userIdToLogin = role === UserRole.ADMIN
-                ? users.find(u => u.role === UserRole.ADMIN)?.id
-                : selectedUserId;
-            
-            if (!userIdToLogin) {
-                throw new Error("Pengguna tidak ditemukan.");
-            }
-            await login(role, userIdToLogin, password);
+        const userIdToLogin = role === UserRole.ADMIN
+            ? users.find(u => u.role === UserRole.ADMIN)?.id ?? 'admin' // Provide a fallback for admin
+            : selectedUserId;
+        
+        if (!userIdToLogin) {
+            throw new Error("Pengguna tidak ditemukan.");
         }
+        await login(role, userIdToLogin, password);
     } catch (err: any) {
         setError(err.message || 'Login gagal. Silakan coba lagi.');
     } finally {
@@ -48,23 +42,6 @@ const LoginPage: React.FC = () => {
   };
 
   const judgeUsers = users.filter(u => u.role === UserRole.JUDGE);
-  // Temporary fix for public login until a proper guest session is designed
-  if (role === UserRole.PUBLIC && !isLoading) {
-      return (
-          <div className="min-h-screen flex items-center justify-center bg-abu-abu p-4">
-              <Card className="w-full max-w-md text-center">
-                   <h2 className="text-3xl font-bold text-merah mb-4">Tampilan Publik</h2>
-                   <p className="text-abu-abu-gelap mb-6">Fungsionalitas login publik sedang dalam pengembangan. Silakan login sebagai Juri atau Admin.</p>
-                   <button
-                       onClick={() => handleRoleChange(UserRole.JUDGE)}
-                       className="w-full bg-merah text-putih font-bold py-3 px-4 rounded-lg hover:bg-merah-tua transition-colors"
-                   >
-                       Kembali ke Halaman Login
-                   </button>
-              </Card>
-          </div>
-      )
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-abu-abu p-4">
@@ -136,7 +113,7 @@ const LoginPage: React.FC = () => {
 
           <button
             type="submit"
-            disabled={isLoading || (role === UserRole.JUDGE && !selectedUserId) || !password}
+            disabled={isLoading || (role === UserRole.JUDGE && !selectedUserId)}
             className="w-full bg-merah text-putih font-bold py-3 px-4 rounded-lg hover:bg-merah-tua transition-colors duration-300 disabled:bg-gray-400 flex items-center justify-center space-x-2"
           >
             {isLoading ? <LoaderCircle className="animate-spin" size={20} /> : <LogIn size={20} />}
