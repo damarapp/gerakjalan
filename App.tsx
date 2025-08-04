@@ -77,9 +77,11 @@ const App: React.FC = () => {
                    <Route path="*" element={<Navigate to={getHomeRoute()} />} />
               </Route>
           ) : (
-             /* For any other route when not logged in, redirect to login page before showing it */
-             <Route path="/admin/*" element={<Navigate to="/login" />} />
-             <Route path="/judge" element={<Navigate to="/login" />} />
+             <>
+                {/* For any other route when not logged in, redirect to login page before showing it */}
+                <Route path="/admin/*" element={<Navigate to="/login" />} />
+                <Route path="/judge" element={<Navigate to="/login" />} />
+             </>
           )}
 
            {/* Fallback for any non-defined routes */}
