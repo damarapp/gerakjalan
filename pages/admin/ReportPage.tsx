@@ -12,6 +12,13 @@ const ReportPage: React.FC = () => {
         window.print();
     };
 
+    // Create a mapping for anonymous judge names
+    const judgeNameMap = new Map<string, string>();
+    const judgesForReport = users.filter(u => u.role === UserRole.JUDGE && u.assignedPostId);
+    judgesForReport.forEach((judge, index) => {
+        judgeNameMap.set(judge.id, `Juri ${index + 1}`);
+    });
+
     const categories: { level: TeamLevel; gender: TeamGender }[] = [];
     Object.values(TeamLevel).forEach(level => {
         Object.values(TeamGender).forEach(gender => {
@@ -104,7 +111,7 @@ const ReportPage: React.FC = () => {
                                             {postOrder.flatMap(postId => 
                                                 groupedJudgesByPost[postId].judges.map(judge => (
                                                     <th key={judge.id} className="p-2 border text-center font-normal whitespace-nowrap">
-                                                        {judge.name}
+                                                        {judgeNameMap.get(judge.id)}
                                                         {judge.isRovingJudge && <div className="text-xs text-red-600">(Pengurangan)</div>}
                                                     </th>
                                                 ))

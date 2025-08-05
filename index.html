@@ -36,13 +36,27 @@
             break-before: page;
         }
         @page {
-            margin: 0.75in;
+            margin: 0.5in;
+            size: A4 landscape; /* Suggest landscape mode for wide tables */
         }
         thead {
             display: table-header-group; /* Ensure table headers repeat on each page */
         }
         tr {
             page-break-inside: avoid; /* Avoid breaking rows across pages */
+        }
+        /* New rules for table printing */
+        .overflow-x-auto {
+            overflow-x: visible !important;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Ensure borders are neat */
+        }
+        th, td {
+            /* Smaller font and padding for print */
+            font-size: 9pt !important;
+            padding: 4px !important;
         }
       }
     </style>
