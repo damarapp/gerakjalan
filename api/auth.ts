@@ -1,3 +1,4 @@
+
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { connectToDatabase } from './mongo.js';
 import { User as ClientUser, UserRole } from '../types.js';
@@ -10,6 +11,7 @@ interface UserInDb {
     password?: string;
     assignedPostId?: string;
     assignedCriteriaIds?: string[];
+    isRovingJudge?: boolean;
 }
 
 export type AuthenticatedRequest = VercelRequest & {
