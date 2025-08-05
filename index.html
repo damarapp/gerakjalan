@@ -27,6 +27,8 @@
         }
         body {
           background-color: #fff !important;
+          -webkit-print-color-adjust: exact; /* Ensures colors are printed */
+          print-color-adjust: exact;
         }
         .printable-card {
            box-shadow: none !important;
@@ -36,27 +38,32 @@
             break-before: page;
         }
         @page {
-            margin: 0.5in;
-            size: A4 landscape; /* Suggest landscape mode for wide tables */
+            /* Let the browser handle orientation, reduce margins for more space */
+            size: auto;
+            margin: 0.25in;
         }
         thead {
             display: table-header-group; /* Ensure table headers repeat on each page */
         }
-        tr {
-            page-break-inside: avoid; /* Avoid breaking rows across pages */
+        tr, table, tbody, thead {
+            page-break-inside: avoid; /* Avoid breaking content across pages */
         }
-        /* New rules for table printing */
         .overflow-x-auto {
             overflow-x: visible !important;
         }
         table {
             width: 100%;
             border-collapse: collapse; /* Ensure borders are neat */
+            table-layout: auto; /* Let table adjust column widths */
         }
         th, td {
-            /* Smaller font and padding for print */
-            font-size: 9pt !important;
-            padding: 4px !important;
+            /* Further optimized font and padding for print */
+            font-size: 8pt !important;
+            padding: 3px !important;
+            word-wrap: break-word; /* Allow long names to wrap */
+        }
+        th {
+            font-weight: bold;
         }
       }
     </style>
