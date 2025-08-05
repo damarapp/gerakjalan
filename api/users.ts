@@ -55,13 +55,27 @@ const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<
             }
             case 'DELETE': {
                 const { id } = req.query;
-                if (!id || typeof id !== 'string') {
-                    res.status(400).json({ message: 'ID is required' });
+                if (!id || typeof id !== 'string' || !ObjectId.isValid(id)) {
+                    res.status(400).json({ message: 'A valid user ID is required' });
                     return;
                 }
                 
                 if (req.user.id === id) {
                     res.status(403).json({ message: "You cannot delete your own account."});
+                    return;
+                }
+
+                // Fetch the user to be deleted to check their role
+                const userToDelete = await usersCollection.findOne({ _id: new ObjectId(id) });
+
+                if (!userToDelete) {
+                    res.status(404).json({ message: "User to delete not found." });
+                    return;
+                }
+
+                // Rule: Only super admin ('admin') can delete other admins
+                if (userToDelete.role === UserRole.ADMIN && req.user.name !== 'admin') {
+                    res.status(403).json({ message: "Forbidden: Only a super admin can delete other admin accounts." });
                     return;
                 }
 

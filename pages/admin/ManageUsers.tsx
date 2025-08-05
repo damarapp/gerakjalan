@@ -108,9 +108,9 @@ const ManageUsers: React.FC = () => {
                 await addUser(payload);
             }
             closeModal();
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert(`Gagal menyimpan pengguna: ${error}`);
+            alert(`Gagal menyimpan pengguna: ${error.message || error}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -119,6 +119,11 @@ const ManageUsers: React.FC = () => {
     const handleDelete = async (userToDelete: User) => {
         if (userToDelete.id === currentUser?.id) {
             alert('Anda tidak dapat menghapus akun Anda sendiri.');
+            return;
+        }
+
+        if (userToDelete.role === UserRole.ADMIN && currentUser?.name !== 'admin') {
+            alert('Hanya super admin yang dapat menghapus admin lain.');
             return;
         }
         
@@ -131,9 +136,9 @@ const ManageUsers: React.FC = () => {
         if(window.confirm(`Apakah Anda yakin ingin menghapus pengguna ${userToDelete.name}?`)){
             try {
                 await deleteUser(userToDelete.id);
-            } catch (error) {
+            } catch (error: any) {
                 console.error(error);
-                alert(`Gagal menghapus pengguna: ${error}`);
+                alert(`Gagal menghapus pengguna: ${error.message || error}`);
             }
         }
     };
@@ -158,46 +163,60 @@ const ManageUsers: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => (
-                            <tr key={user.id} className="border-b border-gray-200">
-                                <td className="p-3 font-semibold">{user.name}</td>
-                                <td className="p-3">
-                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.role === UserRole.ADMIN ? 'bg-merah text-putih' : 'bg-gray-200 text-gray-700'}`}>
-                                        {user.role === UserRole.ADMIN ? 'Admin' : 'Juri'}
-                                    </span>
-                                </td>
-                                <td className="p-3 text-sm text-gray-600">
-                                    {user.role === UserRole.JUDGE ? (
-                                        <div>
-                                            <div className='font-bold'>{posts.find(p => p.id === user.assignedPostId)?.name || 'Belum Ditugaskan'}</div>
-                                            {user.assignedCriteriaIds && user.assignedCriteriaIds.length > 0 && (
-                                                <ul className='list-disc list-inside pl-1'>
-                                                    {user.assignedCriteriaIds.map(cid => {
-                                                        const post = posts.find(p => p.id === user.assignedPostId);
-                                                        const criterion = post?.criteria.find(c => c.id === cid);
-                                                        return <li key={cid}>{criterion?.name || 'Kriteria Dihapus'}</li>
-                                                    })}
-                                                </ul>
-                                            )}
-                                        </div>
-                                    ) : user.role === UserRole.ADMIN ? (
-                                        <div>
-                                            {user.permissions && user.permissions.length > 0 ? (
-                                                <ul className='list-disc list-inside'>
-                                                    {user.permissions.map(p => (
-                                                        <li key={p}>{permissionLabels[p as AdminPermission]}</li>
-                                                    ))}
-                                                </ul>
-                                            ) : (<span className="text-gray-500">Tidak ada hak akses khusus</span>)}
-                                        </div>
-                                    ) : '-'}
-                                </td>
-                                <td className="p-3 text-right">
-                                    <button onClick={() => openModal(user)} className="text-blue-600 hover:text-blue-800 mr-2 p-1"><Edit size={18}/></button>
-                                    <button onClick={() => handleDelete(user)} className="text-merah hover:text-merah-tua p-1"><Trash2 size={18}/></button>
-                                </td>
-                            </tr>
-                        ))}
+                        {users.map(user => {
+                             const isSelf = user.id === currentUser?.id;
+                             const isTargetAdmin = user.role === UserRole.ADMIN;
+                             const isSuperAdmin = currentUser?.name === 'admin';
+                             const canDelete = (isSuperAdmin || !isTargetAdmin) && !isSelf;
+
+                            return (
+                                <tr key={user.id} className="border-b border-gray-200">
+                                    <td className="p-3 font-semibold">{user.name}</td>
+                                    <td className="p-3">
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.role === UserRole.ADMIN ? 'bg-merah text-putih' : 'bg-gray-200 text-gray-700'}`}>
+                                            {user.role === UserRole.ADMIN ? 'Admin' : 'Juri'}
+                                        </span>
+                                    </td>
+                                    <td className="p-3 text-sm text-gray-600">
+                                        {user.role === UserRole.JUDGE ? (
+                                            <div>
+                                                <div className='font-bold'>{posts.find(p => p.id === user.assignedPostId)?.name || 'Belum Ditugaskan'}</div>
+                                                {user.assignedCriteriaIds && user.assignedCriteriaIds.length > 0 && (
+                                                    <ul className='list-disc list-inside pl-1'>
+                                                        {user.assignedCriteriaIds.map(cid => {
+                                                            const post = posts.find(p => p.id === user.assignedPostId);
+                                                            const criterion = post?.criteria.find(c => c.id === cid);
+                                                            return <li key={cid}>{criterion?.name || 'Kriteria Dihapus'}</li>
+                                                        })}
+                                                    </ul>
+                                                )}
+                                            </div>
+                                        ) : user.role === UserRole.ADMIN ? (
+                                            <div>
+                                                {user.name === 'admin' ? (<span className="font-semibold text-merah">Super Admin</span>) : user.permissions && user.permissions.length > 0 ? (
+                                                    <ul className='list-disc list-inside'>
+                                                        {user.permissions.map(p => (
+                                                            <li key={p}>{permissionLabels[p as AdminPermission]}</li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (<span className="text-gray-500">Tidak ada hak akses khusus</span>)}
+                                            </div>
+                                        ) : '-'}
+                                    </td>
+                                    <td className="p-3 text-right">
+                                        <button onClick={() => openModal(user)} className="text-blue-600 hover:text-blue-800 mr-2 p-1"><Edit size={18}/></button>
+                                        <button 
+                                            onClick={() => handleDelete(user)} 
+                                            disabled={!canDelete}
+                                            className="p-1 transition-colors disabled:text-gray-400 disabled:cursor-not-allowed text-merah hover:text-merah-tua"
+                                            title={!canDelete ? (isSelf ? 'Anda tidak dapat menghapus akun sendiri' : 'Hanya Super Admin yang dapat menghapus admin lain') : `Hapus ${user.name}`}
+                                        >
+                                            <Trash2 size={18}/>
+                                        </button>
+                                    </td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </table>
             </div>
@@ -265,7 +284,7 @@ const ManageUsers: React.FC = () => {
                                 )}
                                 </>
                             )}
-                             {role === UserRole.ADMIN && currentUser?.name === 'admin' && (
+                             {role === UserRole.ADMIN && currentUser?.name === 'admin' && currentUserToEdit?.name !== 'admin' && (
                                 <div>
                                     <label className="block text-sm font-medium">Hak Akses Admin</label>
                                     <p className="text-xs text-gray-500 mb-2">Pilih halaman mana saja yang dapat diakses oleh admin ini.</p>
@@ -277,8 +296,7 @@ const ManageUsers: React.FC = () => {
                                                     id={`permission-${p}`}
                                                     checked={permissions.includes(p)}
                                                     onChange={() => handlePermissionChange(p)}
-                                                    disabled={currentUserToEdit?.name === 'admin'}
-                                                    className="h-4 w-4 rounded border-gray-300 text-merah focus:ring-merah disabled:bg-gray-200"
+                                                    className="h-4 w-4 rounded border-gray-300 text-merah focus:ring-merah"
                                                 />
                                                 <label htmlFor={`permission-${p}`} className="ml-3 block text-sm text-gray-800 select-none cursor-pointer">
                                                     {permissionLabels[p]}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { Team, TeamLevel, TeamGender, NewTeamPayload } from '../../types';
 import Card from '../../components/Card';
-import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Printer } from 'lucide-react';
 
 const ManageTeams: React.FC = () => {
     const { teams, addTeam, updateTeam, deleteTeam } = useAppContext();
@@ -16,7 +16,6 @@ const ManageTeams: React.FC = () => {
     const [level, setLevel] = useState<TeamLevel>(TeamLevel.SD);
     const [gender, setGender] = useState<TeamGender>(TeamGender.PUTRA);
 
-    // New state for tabs
     const [activeTab, setActiveTab] = useState<TeamLevel>(TeamLevel.SD);
 
     const openModal = (team: Team | null = null) => {
@@ -73,6 +72,10 @@ const ManageTeams: React.FC = () => {
         }
     };
 
+    const handlePrint = () => {
+        window.print();
+    };
+
     const filteredTeams = teams
         .filter(team => team.level === activeTab)
         .sort((a,b) => a.number.localeCompare(b.number));
@@ -97,16 +100,27 @@ const ManageTeams: React.FC = () => {
     }
 
     return (
-        <Card>
-            <div className="flex justify-between items-center mb-4">
+        <Card className="printable-card">
+            <div className="hidden print:block mb-4 text-center">
+                <h2 className="text-xl font-bold">Daftar Regu Peserta</h2>
+                <p className="text-base">Kategori: {activeTab}</p>
+            </div>
+
+            <div className="flex justify-between items-center mb-4 no-print">
                 <h3 className="font-bold text-xl text-merah">Kelola Regu Peserta</h3>
-                <button onClick={() => openModal()} className="bg-merah text-putih font-bold py-2 px-4 rounded-lg hover:bg-merah-tua flex items-center space-x-2">
-                    <PlusCircle size={20} />
-                    <span>Tambah Regu</span>
-                </button>
+                <div className="flex items-center gap-2">
+                    <button onClick={handlePrint} className="bg-blue-600 text-putih font-bold py-2 px-4 rounded-lg hover:bg-blue-800 flex items-center space-x-2">
+                        <Printer size={20} />
+                        <span>Cetak Daftar</span>
+                    </button>
+                    <button onClick={() => openModal()} className="bg-merah text-putih font-bold py-2 px-4 rounded-lg hover:bg-merah-tua flex items-center space-x-2">
+                        <PlusCircle size={20} />
+                        <span>Tambah Regu</span>
+                    </button>
+                </div>
             </div>
             
-            <div className="border-b border-gray-200 mb-4">
+            <div className="border-b border-gray-200 mb-4 no-print">
                 <nav className="-mb-px flex space-x-2" aria-label="Tabs">
                     {Object.values(TeamLevel).map(level => (
                        <TabButton key={level} tabLevel={level} />
@@ -121,7 +135,7 @@ const ManageTeams: React.FC = () => {
                             <th className="p-3">No. Urut</th>
                             <th className="p-3">Nama Regu</th>
                             <th className="p-3">Jenis</th>
-                            <th className="p-3 text-right">Aksi</th>
+                            <th className="p-3 text-right no-print">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -130,14 +144,14 @@ const ManageTeams: React.FC = () => {
                                 <td className="p-3">{team.number}</td>
                                 <td className="p-3 font-semibold">{team.name}</td>
                                 <td className="p-3">{team.gender}</td>
-                                <td className="p-3 text-right">
+                                <td className="p-3 text-right no-print">
                                     <button onClick={() => openModal(team)} className="text-blue-600 hover:text-blue-800 mr-2 p-1"><Edit size={18}/></button>
                                     <button onClick={() => handleDelete(team.id)} className="text-merah hover:text-merah-tua p-1"><Trash2 size={18}/></button>
                                 </td>
                             </tr>
                         )) : (
                            <tr>
-                               <td colSpan={4} className="text-center p-8 text-gray-500">
+                               <td colSpan={4} className="text-center p-8 text-gray-500 no-print">
                                    Belum ada regu untuk kategori {activeTab}.
                                </td>
                            </tr>
@@ -146,7 +160,7 @@ const ManageTeams: React.FC = () => {
                 </table>
             </div>
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50 no-print">
                     <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
                         <h4 className="font-bold text-lg mb-4">{currentTeam ? 'Edit' : 'Tambah'} Regu</h4>
                         <form onSubmit={handleSubmit} className="space-y-4">

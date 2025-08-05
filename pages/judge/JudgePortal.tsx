@@ -128,12 +128,23 @@ const JudgePortal: React.FC = () => {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <Card className="mb-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 className="text-2xl font-bold text-merah">Portal Juri: {assignedPost.name}</h2>
-                <p className="text-abu-abu-gelap">Masukkan nilai untuk setiap regu di bawah ini.</p>
+                <h2 className="text-2xl font-bold text-merah">Selamat Datang, {currentUser?.name}!</h2>
+                <p className="text-abu-abu-gelap mt-1">Berikut adalah rincian tugas penilaian Anda:</p>
+                <div className="mt-2 text-sm text-gray-700 p-3 bg-gray-100 rounded-lg">
+                    <p><strong>Pos Penugasan:</strong> {assignedPost.name}</p>
+                    <p className="mt-1"><strong>Kriteria yang Dinilai:</strong></p>
+                    {assignedCriteria.length > 0 ? (
+                        <ul className="list-disc list-inside ml-4">
+                            {assignedCriteria.map(c => <li key={c.id}>{c.name}</li>)}
+                        </ul>
+                    ) : (
+                        <p className="ml-4">Semua kriteria di pos ini.</p>
+                    )}
+                </div>
             </div>
-            <div className="relative mt-4 sm:mt-0">
+            <div className="relative mt-4 sm:mt-0 w-full sm:w-auto">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
                 <input 
                     type="search"

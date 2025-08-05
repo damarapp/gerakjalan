@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
   <head>
@@ -31,7 +30,19 @@
         }
         .printable-card {
            box-shadow: none !important;
-           border: none !important;
+           border: 1px solid #e5e7eb !important;
+        }
+        .break-before-page {
+            break-before: page;
+        }
+        @page {
+            margin: 0.75in;
+        }
+        thead {
+            display: table-header-group; /* Ensure table headers repeat on each page */
+        }
+        tr {
+            page-break-inside: avoid; /* Avoid breaking rows across pages */
         }
       }
     </style>

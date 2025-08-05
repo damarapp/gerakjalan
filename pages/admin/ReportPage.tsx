@@ -24,7 +24,7 @@ const ReportPage: React.FC = () => {
 
     return (
         <Card className="printable-card">
-            <div className="flex justify-between items-center mb-8 border-b pb-4">
+            <div className="flex justify-between items-center mb-8 border-b pb-4 no-print">
                 <div>
                     <h2 className="text-2xl font-bold text-merah">Laporan Hasil Akhir Penjurian</h2>
                     <p className="text-abu-abu-gelap">Lomba Gerak Jalan Kemerdekaan</p>
@@ -39,7 +39,7 @@ const ReportPage: React.FC = () => {
             </div>
 
             <div className="space-y-12">
-                {categories.map(({ level, gender }) => {
+                {categories.map(({ level, gender }, index) => {
                     const rankedScores = calculateScores({ level, gender });
                     
                     if (rankedScores.length === 0) {
@@ -74,7 +74,11 @@ const ReportPage: React.FC = () => {
 
 
                     return (
-                        <div key={`${level}-${gender}`} className="page-break-before">
+                        <div key={`${level}-${gender}`} className={index > 0 ? "break-before-page" : ""}>
+                             <div className="text-center mb-4 hidden print:block">
+                                <h2 className="text-xl font-bold">Laporan Hasil Akhir Penjurian</h2>
+                                <p className="text-base">Lomba Gerak Jalan Kemerdekaan</p>
+                             </div>
                             <h3 className="text-xl font-bold mb-4">
                                 Kategori: <span className="text-merah">{level} - {gender}</span>
                             </h3>
