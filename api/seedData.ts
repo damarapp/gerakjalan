@@ -29,28 +29,40 @@ export const initialUsers = [
     name: "Ahmad Fauzi",
     role: UserRole.JUDGE,
     assignedPostId: post1Id,
-    assignedCriteriaIds: ["c1", "c2"]
+    assignedCriteriaIds: ["c1", "c2"],
+    isRovingJudge: false,
   },
   {
     _id: new ObjectId(),
     name: "Siti Aminah",
     role: UserRole.JUDGE,
     assignedPostId: post2Id,
-    assignedCriteriaIds: ["c3", "c4"]
+    assignedCriteriaIds: ["c3", "c4"],
+    isRovingJudge: false,
   },
   {
     _id: new ObjectId(),
     name: "Budi Santoso",
     role: UserRole.JUDGE,
     assignedPostId: post3Id,
-    assignedCriteriaIds: ["c5", "c6"]
+    assignedCriteriaIds: ["c5", "c6"],
+    isRovingJudge: false,
   },
   {
     _id: new ObjectId(),
     name: "Rina Marlina",
     role: UserRole.JUDGE,
     assignedPostId: post1Id,
-    assignedCriteriaIds: ["c1", "c2"]
+    assignedCriteriaIds: ["c1", "c2"],
+    isRovingJudge: false,
+  },
+  {
+    _id: new ObjectId(),
+    name: "Juri Keliling 1",
+    role: UserRole.JUDGE,
+    assignedPostId: post2Id, // Can be assigned to any post
+    assignedCriteriaIds: ["c3", "c4"], // Can use any criteria
+    isRovingJudge: true,
   }
 ];
 

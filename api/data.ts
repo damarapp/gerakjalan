@@ -43,17 +43,15 @@ export default async (req: VercelRequest, res: VercelResponse) => {
             }
         }
 
-        // 3. Ensure initial posts exist
-        for (const post of initialPosts) {
-            const { _id, ...postData } = post;
-            await postsCollection.updateOne(
-                { _id: new ObjectId(_id as any) }, // Match by the fixed string ID from seed data
-                { $set: postData },
-                { upsert: true }
-            );
+        // 3. Seed initial posts ONLY if the posts collection is empty.
+        // This prevents overwriting user modifications.
+        const postCount = await postsCollection.countDocuments();
+        if (postCount === 0 && initialPosts.length > 0) {
+            await postsCollection.insertMany(initialPosts);
+            console.log("Seeded initial posts because collection was empty.");
         }
-        console.log('Seeding process completed/verified.');
-        // -----------------------------
+        
+        // --- End Seeding Logic ---
 
         const [teams, users, posts, scores] = await Promise.all([
             db.collection('teams').find().sort({ number: 1 }).toArray(),
