@@ -71,8 +71,8 @@ const Leaderboard: React.FC = () => {
                                         {team.judgeScores.length > 0 ? (
                                             <ul className="list-disc list-inside">
                                                 {team.judgeScores.map(js => (
-                                                    <li key={js.judgeId} className={js.isRovingJudge ? 'text-red-600' : ''}>
-                                                        {js.judgeName} ({js.postName}){js.isRovingJudge && ' (Pengurangan)'}: <strong>{js.score}</strong>
+                                                    <li key={js.judgeId}>
+                                                        {js.judgeName} ({js.postName}): <strong>{js.score}</strong>
                                                     </li>
                                                 ))}
                                             </ul>

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { Post, Team, Score, Criterion } from '../../types';
 import Card from '../../components/Card';
-import { Save, Search, CheckCircle, LoaderCircle, AlertTriangle } from 'lucide-react';
+import { Save, Search, CheckCircle, LoaderCircle } from 'lucide-react';
 
 const JudgePortal: React.FC = () => {
   const { currentUser, posts, teams, scores, submitScore } = useAppContext();
@@ -14,8 +14,6 @@ const JudgePortal: React.FC = () => {
   const [teamScores, setTeamScores] = useState<Record<string, { [criterionId: string]: string | number }>>({});
   const [saveStatus, setSaveStatus] = useState<Record<string, 'idle' | 'saving' | 'saved'>>({});
 
-  const isRovingJudge = currentUser?.isRovingJudge === true;
-  const maxScore = isRovingJudge ? 5 : 100;
 
   useEffect(() => {
     if (currentUser && currentUser.assignedPostId) {
@@ -53,7 +51,7 @@ const JudgePortal: React.FC = () => {
     if (value !== '') {
         const parsedScore = parseInt(value, 10);
         if (!isNaN(parsedScore)) {
-            newScore = Math.max(0, Math.min(maxScore, parsedScore));
+            newScore = Math.max(0, Math.min(100, parsedScore));
         }
     }
 
@@ -82,7 +80,7 @@ const JudgePortal: React.FC = () => {
         } else if (typeof scoreValue === 'string' && scoreValue !== '') {
             finalScore = parseInt(scoreValue, 10) || 0;
         }
-        scoresToSubmit[criterion.id] = Math.max(0, Math.min(maxScore, finalScore));
+        scoresToSubmit[criterion.id] = Math.max(0, Math.min(100, finalScore));
     });
 
     const newScore: Score = {
@@ -98,9 +96,9 @@ const JudgePortal: React.FC = () => {
         setTimeout(() => {
             setSaveStatus(prev => ({ ...prev, [teamId]: 'idle' }));
         }, 2000);
-    } catch(error: any) {
+    } catch(error) {
         console.error("Failed to save score:", error);
-        alert(`Gagal menyimpan skor: ${error.message || "Periksa koneksi Anda."}`);
+        alert("Gagal menyimpan skor. Periksa koneksi Anda.");
         setSaveStatus(prev => ({...prev, [teamId]: 'idle'}));
     }
   };
@@ -132,14 +130,8 @@ const JudgePortal: React.FC = () => {
       <Card className="mb-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                 <h2 className="text-2xl font-bold text-merah">Selamat Datang, {currentUser?.name}!</h2>
-                {isRovingJudge && (
-                    <div className="mt-2 text-sm text-yellow-800 bg-yellow-100 border-l-4 border-yellow-500 p-3 rounded-r-lg">
-                        <p className="font-bold flex items-center"><AlertTriangle size={16} className="mr-2"/> Mode Juri Keliling (Pengurangan Poin)</p>
-                        <p>Setiap poin yang Anda berikan akan mengurangi total nilai regu. Maksimal skor per kriteria adalah <strong>{maxScore}</strong>.</p>
-                    </div>
-                )}
-                <p className="text-abu-abu-gelap mt-3">Berikut adalah rincian tugas penilaian Anda:</p>
+                <h2 className="text-2xl font-bold text-merah">Selamat Datang, {currentUser?.name}!</h2>
+                <p className="text-abu-abu-gelap mt-1">Berikut adalah rincian tugas penilaian Anda:</p>
                 <div className="mt-2 text-sm text-gray-700 p-3 bg-gray-100 rounded-lg">
                     <p><strong>Pos Penugasan:</strong> {assignedPost.name}</p>
                     <p className="mt-1"><strong>Kriteria yang Dinilai:</strong></p>
@@ -180,13 +172,13 @@ const JudgePortal: React.FC = () => {
                         {assignedCriteria.map(criterion => (
                             <div key={criterion.id}>
                                 <label htmlFor={`${team.id}-${criterion.id}`} className="block text-sm font-medium text-gray-700">
-                                    {isRovingJudge ? `Pengurangan: ${criterion.name}`: criterion.name}
+                                    {criterion.name}
                                 </label>
                                 <input
                                     type="number"
                                     id={`${team.id}-${criterion.id}`}
                                     min="0"
-                                    max={maxScore}
+                                    max="100"
                                     value={teamScores[team.id]?.[criterion.id] ?? ''}
                                     onChange={e => handleScoreChange(team.id, criterion.id, e.target.value)}
                                     className="mt-1 w-full p-2 text-center text-lg font-semibold border-2 border-gray-300 rounded-lg shadow-sm focus:ring-merah focus:border-merah"

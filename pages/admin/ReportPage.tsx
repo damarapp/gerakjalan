@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { TeamLevel, TeamGender, UserRole } from '../../types';
@@ -57,9 +56,9 @@ const ReportPage: React.FC = () => {
                                 judges: []
                             };
                         }
-                        acc[postId].judges.push({ id: judge.id, name: judge.name, isRovingJudge: judge.isRovingJudge });
+                        acc[postId].judges.push({ id: judge.id, name: judge.name });
                         return acc;
-                    }, {} as Record<string, { postName: string; judges: {id: string; name: string; isRovingJudge?: boolean}[] }>);
+                    }, {} as Record<string, { postName: string; judges: {id: string; name: string}[] }>);
 
                     // Sort the post IDs based on the canonical order defined above
                     const postOrder = Object.keys(groupedJudgesByPost).sort((a, b) => {
@@ -105,7 +104,6 @@ const ReportPage: React.FC = () => {
                                                 groupedJudgesByPost[postId].judges.map(judge => (
                                                     <th key={judge.id} className="p-2 border text-center font-normal whitespace-nowrap">
                                                         {judge.name}
-                                                        {judge.isRovingJudge && <div className="text-xs text-red-600">(Pengurangan)</div>}
                                                     </th>
                                                 ))
                                             )}
@@ -122,7 +120,7 @@ const ReportPage: React.FC = () => {
                                                         const scoreDetail = team.judgeScores.find(js => js.judgeId === judge.id);
                                                         const score = scoreDetail ? scoreDetail.score.toFixed(0) : '-';
                                                         return (
-                                                            <td key={judge.id} className={`p-2 border text-center ${scoreDetail?.isRovingJudge ? 'text-red-600' : ''}`}>{score}</td>
+                                                            <td key={judge.id} className="p-2 border text-center">{score}</td>
                                                         );
                                                     })
                                                 )}

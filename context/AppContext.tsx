@@ -253,20 +253,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                     }
                     return sum;
                 }, 0);
-                
-                // If the judge is a roving judge, subtract the score. Otherwise, add it.
-                if (judge?.isRovingJudge) {
-                    totalScore -= scorePerJudge;
-                } else {
-                    totalScore += scorePerJudge;
-                }
+
+                totalScore += scorePerJudge;
                 
                 return {
                     judgeId: judge?.id || 'unknown-judge',
                     judgeName: judge?.name || 'Unknown Judge',
                     postName: post?.name || 'Unknown Post',
-                    score: scorePerJudge,
-                    isRovingJudge: judge?.isRovingJudge || false,
+                    score: scorePerJudge
                 };
             });
             

@@ -24,7 +24,6 @@ const ManageUsers: React.FC = () => {
     const [assignedCriteriaIds, setAssignedCriteriaIds] = useState<string[]>([]);
     const [availableCriteria, setAvailableCriteria] = useState<Criterion[]>([]);
     const [permissions, setPermissions] = useState<AdminPermission[]>([]);
-    const [isRovingJudge, setIsRovingJudge] = useState(false);
 
     const openModal = (user: User | null = null) => {
         setCurrentUserToEdit(user);
@@ -36,7 +35,6 @@ const ManageUsers: React.FC = () => {
         setAssignedPostId(userPostId);
         setAssignedCriteriaIds(user && user.role === UserRole.JUDGE && user.assignedCriteriaIds ? user.assignedCriteriaIds : []);
         setPermissions(user && user.role === UserRole.ADMIN ? user.permissions || [] : []);
-        setIsRovingJudge(user && user.role === UserRole.JUDGE ? user.isRovingJudge || false : false);
         setIsModalOpen(true);
     };
 
@@ -50,12 +48,9 @@ const ManageUsers: React.FC = () => {
     }, [assignedPostId, role, posts]);
     
     useEffect(() => {
-        // Reset permissions and roving status when role changes
+        // Reset permissions when role changes to JUDGE
         if (role === UserRole.JUDGE) {
             setPermissions([]);
-        }
-        if (role === UserRole.ADMIN) {
-            setIsRovingJudge(false);
         }
     }, [role]);
 
@@ -98,7 +93,6 @@ const ManageUsers: React.FC = () => {
                     assignedPostId, 
                     assignedCriteriaIds,
                     permissions: role === UserRole.ADMIN ? permissions : [],
-                    isRovingJudge: role === UserRole.JUDGE ? isRovingJudge : false,
                 };
                 if(password && role === UserRole.ADMIN) payload.password = password;
                 await updateUser(payload);
@@ -110,7 +104,6 @@ const ManageUsers: React.FC = () => {
                     assignedPostId: role === UserRole.JUDGE ? assignedPostId : undefined,
                     assignedCriteriaIds: role === UserRole.JUDGE ? assignedCriteriaIds : [],
                     permissions: role === UserRole.ADMIN ? permissions : [],
-                    isRovingJudge: role === UserRole.JUDGE ? isRovingJudge : false,
                 };
                 await addUser(payload);
             }
@@ -180,16 +173,9 @@ const ManageUsers: React.FC = () => {
                                 <tr key={user.id} className="border-b border-gray-200">
                                     <td className="p-3 font-semibold">{user.name}</td>
                                     <td className="p-3">
-                                        <div className="flex flex-col gap-1">
-                                            <span className={`px-2 py-1 text-xs font-semibold rounded-full w-min ${user.role === UserRole.ADMIN ? 'bg-merah text-putih' : 'bg-gray-200 text-gray-700'}`}>
-                                                {user.role === UserRole.ADMIN ? 'Admin' : 'Juri'}
-                                            </span>
-                                            {user.isRovingJudge && (
-                                                <span className="px-2 py-1 text-xs font-semibold rounded-full w-min bg-yellow-200 text-yellow-800">
-                                                    Keliling
-                                                </span>
-                                            )}
-                                        </div>
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.role === UserRole.ADMIN ? 'bg-merah text-putih' : 'bg-gray-200 text-gray-700'}`}>
+                                            {user.role === UserRole.ADMIN ? 'Admin' : 'Juri'}
+                                        </span>
                                     </td>
                                     <td className="p-3 text-sm text-gray-600">
                                         {user.role === UserRole.JUDGE ? (
@@ -268,51 +254,34 @@ const ManageUsers: React.FC = () => {
 
                             {role === UserRole.JUDGE && (
                                 <>
-                                <div className="space-y-4 rounded-lg border border-gray-200 p-4">
-                                    <div className="flex items-start">
-                                        <div className="flex items-center h-5">
-                                            <input
-                                                id="roving-judge"
-                                                type="checkbox"
-                                                checked={isRovingJudge}
-                                                onChange={(e) => setIsRovingJudge(e.target.checked)}
-                                                className="focus:ring-merah h-4 w-4 text-merah border-gray-300 rounded"
-                                            />
-                                        </div>
-                                        <div className="ml-3 text-sm">
-                                            <label htmlFor="roving-judge" className="font-medium text-gray-700">Juri Keliling (Pengurangan Poin)</label>
-                                            <p className="text-gray-500">Skor dari juri ini akan mengurangi total nilai regu (maksimal 5 poin per kriteria).</p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">Tugaskan ke Pos</label>
-                                        <select value={assignedPostId || ''} onChange={e => handlePostChange(e.target.value)} className="w-full p-2 border rounded">
-                                            <option value="">Tidak Ditugaskan</option>
-                                            {posts.map(post => <option key={post.id} value={post.id}>{post.name}</option>)}
-                                        </select>
-                                    </div>
-                                    {assignedPostId && availableCriteria.length > 0 && (
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Kriteria yang Dinilai</label>
-                                            <div className="mt-2 space-y-2 p-3 border rounded-lg bg-gray-50 max-h-40 overflow-y-auto">
-                                                {availableCriteria.map(criterion => (
-                                                    <div key={criterion.id} className="flex items-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            id={`criterion-${criterion.id}`}
-                                                            checked={assignedCriteriaIds.includes(criterion.id)}
-                                                            onChange={() => handleCriteriaChange(criterion.id)}
-                                                            className="h-4 w-4 rounded border-gray-300 text-merah focus:ring-merah"
-                                                        />
-                                                        <label htmlFor={`criterion-${criterion.id}`} className="ml-3 block text-sm text-gray-800 select-none cursor-pointer">
-                                                            {criterion.name}
-                                                        </label>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
+                                <div>
+                                    <label className="block text-sm font-medium">Tugaskan ke Pos</label>
+                                    <select value={assignedPostId || ''} onChange={e => handlePostChange(e.target.value)} className="w-full p-2 border rounded">
+                                        <option value="">Tidak Ditugaskan</option>
+                                        {posts.map(post => <option key={post.id} value={post.id}>{post.name}</option>)}
+                                    </select>
                                 </div>
+                                {assignedPostId && availableCriteria.length > 0 && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Kriteria yang Dinilai</label>
+                                        <div className="mt-2 space-y-2 p-3 border rounded-lg bg-gray-50 max-h-40 overflow-y-auto">
+                                            {availableCriteria.map(criterion => (
+                                                <div key={criterion.id} className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id={`criterion-${criterion.id}`}
+                                                        checked={assignedCriteriaIds.includes(criterion.id)}
+                                                        onChange={() => handleCriteriaChange(criterion.id)}
+                                                        className="h-4 w-4 rounded border-gray-300 text-merah focus:ring-merah"
+                                                    />
+                                                    <label htmlFor={`criterion-${criterion.id}`} className="ml-3 block text-sm text-gray-800 select-none cursor-pointer">
+                                                        {criterion.name}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                                 </>
                             )}
                              {role === UserRole.ADMIN && currentUser?.name === 'admin' && currentUserToEdit?.name !== 'admin' && (

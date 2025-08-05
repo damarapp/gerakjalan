@@ -23,11 +23,6 @@ const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<
                 if (newUser.role === UserRole.ADMIN && req.user.name !== 'admin') {
                     newUser.permissions = [];
                 }
-                 // Ensure isRovingJudge is only for JUDGE role
-                if (newUser.role !== UserRole.JUDGE) {
-                    newUser.isRovingJudge = false;
-                }
-
 
                 const result = await usersCollection.insertOne(newUser);
                 const insertedDoc = await usersCollection.findOne({ _id: result.insertedId });
@@ -52,11 +47,6 @@ const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<
                 // Only super admin can change permissions. Non-super-admins cannot escalate privileges.
                 if (req.user.name !== 'admin') {
                     delete updatePayload.permissions;
-                }
-                
-                // Ensure isRovingJudge is only for JUDGE role
-                if (updatePayload.role !== UserRole.JUDGE) {
-                    updatePayload.isRovingJudge = false;
                 }
 
                 const result = await usersCollection.updateOne({ _id: new ObjectId(id) }, { $set: updatePayload });

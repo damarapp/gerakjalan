@@ -12,7 +12,7 @@ const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<
         switch (req.method) {
             case 'POST': {
                 const scoreData: Score = req.body;
-                const { teamId, postId, judgeId, scores } = scoreData;
+                const { teamId, postId, judgeId } = scoreData;
 
                 // Security check: Ensure the authenticated user (judge) is submitting score for themselves
                 if (req.user.role === UserRole.JUDGE && req.user.id !== judgeId) {
@@ -23,17 +23,6 @@ const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<
                 if (!teamId || !postId || !judgeId) {
                     res.status(400).json({ message: 'teamId, postId, and judgeId are required.' });
                     return;
-                }
-                
-                // Security check for Roving Judges
-                if (req.user.isRovingJudge) {
-                    const maxScore = 5;
-                    for (const criterionId in scores) {
-                        if (scores[criterionId] > maxScore) {
-                            res.status(400).json({ message: `Skor maksimal untuk juri keliling adalah ${maxScore}.` });
-                            return;
-                        }
-                    }
                 }
 
                 const filter = { teamId, postId, judgeId };

@@ -21,7 +21,6 @@ export interface User {
   assignedPostId?: string; // Only for judges
   assignedCriteriaIds?: string[]; // Only for judges
   permissions?: AdminPermission[]; // Only for admins
-  isRovingJudge?: boolean; // For roving judges (deductions)
 }
 
 export enum TeamLevel {
@@ -72,7 +71,6 @@ export interface JudgeScoreDetail {
     judgeName: string;
     postName: string;
     score: number;
-    isRovingJudge?: boolean;
 }
 
 export interface TeamTotalScore {
