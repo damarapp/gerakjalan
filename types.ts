@@ -5,6 +5,13 @@ export enum UserRole {
   PUBLIC = 'PUBLIC',
 }
 
+export enum AdminPermission {
+    MANAGE_TEAMS = 'MANAGE_TEAMS',
+    MANAGE_USERS = 'MANAGE_USERS',
+    MANAGE_POSTS = 'MANAGE_POSTS',
+    VIEW_REPORTS = 'VIEW_REPORTS',
+}
+
 export interface User {
   _id?: string;
   id: string;
@@ -13,6 +20,7 @@ export interface User {
   password?: string;
   assignedPostId?: string; // Only for judges
   assignedCriteriaIds?: string[]; // Only for judges
+  permissions?: AdminPermission[]; // Only for admins
 }
 
 export enum TeamLevel {

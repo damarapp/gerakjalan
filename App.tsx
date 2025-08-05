@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAppContext } from './context/AppContext';
-import { UserRole } from './types';
+import { UserRole, AdminPermission } from './types';
 import { LoaderCircle } from 'lucide-react';
 
 import Header from './components/Header';
@@ -15,6 +15,25 @@ import ReportPage from './pages/admin/ReportPage';
 import JudgePortal from './pages/judge/JudgePortal';
 import PublicLeaderboard from './pages/public/PublicLeaderboard';
 import LandingPage from './pages/public/LandingPage';
+
+// Component to protect admin routes based on specific permissions
+const AdminRouteGuard = ({ children, requiredPermission }: { children: ReactNode, requiredPermission: AdminPermission }) => {
+    const { currentUser } = useAppContext();
+
+    if (!currentUser) {
+        return <Navigate to="/login" replace />;
+    }
+    
+    const isSuperAdmin = currentUser.name === 'admin';
+    const hasPermission = isSuperAdmin || (currentUser.permissions?.includes(requiredPermission) ?? false);
+
+    if (!hasPermission) {
+        // Redirect to the main admin page if permission is lacking
+        return <Navigate to="/admin" replace />;
+    }
+
+    return <>{children}</>;
+};
 
 const App: React.FC = () => {
   const { currentUser, loading } = useAppContext();
@@ -64,10 +83,10 @@ const App: React.FC = () => {
               <Route element={<PrivateLayout />}>
                   {currentUser.role === UserRole.ADMIN && (
                       <Route path="/admin" element={<AdminDashboard />}>
-                          <Route path="teams" element={<ManageTeams />} />
-                          <Route path="users" element={<ManageUsers />} />
-                          <Route path="posts" element={<ManagePosts />} />
-                          <Route path="report" element={<ReportPage />} />
+                          <Route path="teams" element={<AdminRouteGuard requiredPermission={AdminPermission.MANAGE_TEAMS}><ManageTeams /></AdminRouteGuard>} />
+                          <Route path="users" element={<AdminRouteGuard requiredPermission={AdminPermission.MANAGE_USERS}><ManageUsers /></AdminRouteGuard>} />
+                          <Route path="posts" element={<AdminRouteGuard requiredPermission={AdminPermission.MANAGE_POSTS}><ManagePosts /></AdminRouteGuard>} />
+                          <Route path="report" element={<AdminRouteGuard requiredPermission={AdminPermission.VIEW_REPORTS}><ReportPage /></AdminRouteGuard>} />
                       </Route>
                   )}
                   {currentUser.role === UserRole.JUDGE && (

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { UserRole } from '../types';
 import Card from '../components/Card';
-import { LogIn, KeyRound, LoaderCircle } from 'lucide-react';
+import { LogIn, KeyRound, LoaderCircle, User as UserIcon } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const { login, users } = useAppContext();
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [role, setRole] = useState<UserRole>(UserRole.JUDGE);
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -18,14 +19,14 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-        const userIdToLogin = role === UserRole.ADMIN
-            ? users.find(u => u.role === UserRole.ADMIN)?.id ?? 'admin' // Provide a fallback for admin
-            : selectedUserId;
-        
-        if (!userIdToLogin) {
-            throw new Error("Pengguna tidak ditemukan.");
+        if (role === UserRole.ADMIN) {
+            await login(role, username, password);
+        } else { // Judge
+            if (!selectedUserId) {
+                throw new Error("Silakan pilih akun juri Anda.");
+            }
+            await login(role, selectedUserId);
         }
-        await login(role, userIdToLogin, role === UserRole.ADMIN ? password : undefined);
     } catch (err: any) {
         setError(err.message || 'Login gagal. Silakan coba lagi.');
     } finally {
@@ -36,6 +37,7 @@ const LoginPage: React.FC = () => {
   const handleRoleChange = (selectedRole: UserRole) => {
     setRole(selectedRole);
     setSelectedUserId('');
+    setUsername('');
     setPassword('');
     setError('');
   };
@@ -66,7 +68,7 @@ const LoginPage: React.FC = () => {
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
-          {role === UserRole.JUDGE && (
+          {role === UserRole.JUDGE ? (
              <div>
                 <label htmlFor="user-select" className="block text-sm font-medium text-abu-abu-gelap mb-2">
                   Pilih Juri
@@ -84,9 +86,28 @@ const LoginPage: React.FC = () => {
                   ))}
                 </select>
             </div>
-          )}
-
-          {role === UserRole.ADMIN && (
+          ) : (
+            <>
+              <div>
+                  <label htmlFor="username-input" className="block text-sm font-medium text-abu-abu-gelap mb-2">
+                      Username
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <UserIcon className="h-5 w-5 text-gray-400" />
+                    </span>
+                    <input
+                        type="text"
+                        id="username-input"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-merah focus:border-merah"
+                        required
+                        placeholder="Masukkan username admin"
+                        autoComplete="username"
+                    />
+                  </div>
+              </div>
               <div>
                   <label htmlFor="password-input" className="block text-sm font-medium text-abu-abu-gelap mb-2">
                       Password
@@ -103,9 +124,11 @@ const LoginPage: React.FC = () => {
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-merah focus:border-merah"
                         required
                         placeholder="Masukkan password"
+                        autoComplete="current-password"
                     />
                   </div>
               </div>
+            </>
           )}
           
           {error && <p className="text-merah text-sm text-center">{error}</p>}

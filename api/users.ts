@@ -1,3 +1,4 @@
+
 import { VercelResponse } from '@vercel/node';
 import { connectToDatabase } from './mongo.js';
 import { ObjectId } from 'mongodb';
@@ -17,8 +18,15 @@ const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<
                     res.status(400).json({ message: "Password is required for a new Admin user."});
                     return;
                 }
+                
+                // Only super admin can create another admin with permissions
+                if (newUser.role === UserRole.ADMIN && req.user.name !== 'admin') {
+                    newUser.permissions = [];
+                }
+
                 const result = await usersCollection.insertOne(newUser);
                 const insertedDoc = await usersCollection.findOne({ _id: result.insertedId });
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { password, ...userWithoutPassword } = insertedDoc as any;
                 res.status(201).json({ ...userWithoutPassword, id: insertedDoc?._id.toString() });
                 break;
@@ -33,8 +41,15 @@ const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<
                 if (userToUpdate.password === '' || userToUpdate.password === null || userToUpdate.password === undefined) {
                     delete userToUpdate.password;
                 }
+                
+                const updatePayload: any = { ...userToUpdate };
 
-                const result = await usersCollection.updateOne({ _id: new ObjectId(id) }, { $set: userToUpdate });
+                // Only super admin can change permissions. Non-super-admins cannot escalate privileges.
+                if (req.user.name !== 'admin') {
+                    delete updatePayload.permissions;
+                }
+
+                const result = await usersCollection.updateOne({ _id: new ObjectId(id) }, { $set: updatePayload });
                 res.status(200).json(result);
                 break;
             }

@@ -41,7 +41,8 @@ type Action =
     | { type: 'ADD_POST'; payload: Post }
     | { type: 'UPDATE_POST'; payload: Post }
     | { type: 'DELETE_POST'; payload: string }
-    | { type: 'SUBMIT_SCORE_SUCCESS'; payload: Score };
+    | { type: 'SUBMIT_SCORE_SUCCESS'; payload: Score }
+    | { type: 'RESET_SCORES' };
 
 const appReducer = (state: AppState, action: Action): AppState => {
     switch (action.type) {
@@ -74,6 +75,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
             }
             return { ...state, scores: newScores };
         }
+        case 'RESET_SCORES': return { ...state, scores: [] };
 
         default: return state;
     }
@@ -90,7 +92,7 @@ interface AppContextType {
     error: string | null;
 
     // Actions
-    login: (role: UserRole, userId: string, password?: string) => Promise<void>;
+    login: (role: UserRole, identifier: string, password?: string) => Promise<void>;
     logout: () => void;
     addTeam: (team: NewTeamPayload) => Promise<void>;
     updateTeam: (team: UpdateTeamPayload) => Promise<void>;
@@ -102,6 +104,7 @@ interface AppContextType {
     updatePost: (post: UpdatePostPayload) => Promise<void>;
     deletePost: (id: string) => Promise<void>;
     submitScore: (score: Score) => Promise<void>;
+    resetScores: () => Promise<void>;
     calculateScores: (filters: { level: TeamLevel; gender: TeamGender }) => TeamTotalScore[];
 }
 
@@ -157,10 +160,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         fetchData();
     }, [fetchData]);
 
-    const login = useCallback(async (role: UserRole, userId: string, password?: string) => {
+    const login = useCallback(async (role: UserRole, identifier: string, password?: string) => {
+        const payload: any = { role };
+        if (role === UserRole.ADMIN) {
+            payload.username = identifier;
+            payload.password = password;
+        } else { // Judge
+            payload.userId = identifier;
+        }
+
         const { user } = await apiCall('/api/login', {
             method: 'POST',
-            body: JSON.stringify({ role, userId, password }),
+            body: JSON.stringify(payload),
         });
         
         dispatch({ type: 'LOGIN_SUCCESS', payload: user });
@@ -215,6 +226,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const submitScore = useCallback(async (score: Score) => {
         await apiCall('/api/scores', { method: 'POST', body: JSON.stringify(score) });
         dispatch({ type: 'SUBMIT_SCORE_SUCCESS', payload: score });
+    }, [apiCall]);
+
+    const resetScores = useCallback(async () => {
+        await apiCall('/api/scores', { method: 'DELETE' });
+        dispatch({ type: 'RESET_SCORES' });
     }, [apiCall]);
 
     const calculateScores = useCallback((filters: { level: TeamLevel, gender: TeamGender }): TeamTotalScore[] => {
@@ -275,6 +291,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         updatePost,
         deletePost,
         submitScore,
+        resetScores,
         calculateScores,
     };
 

@@ -1,5 +1,6 @@
+
 import { ObjectId } from 'mongodb';
-import { UserRole } from '../types.js';
+import { UserRole, AdminPermission } from '../types.js';
 
 // This data will be automatically inserted into the database on the first run.
 // Unique IDs and passwords are set here.
@@ -13,9 +14,15 @@ const post3Id = "665f12a3b4c5d6e7f8a9b0d3";
 export const initialUsers = [
   {
     _id: new ObjectId(),
-    name: "Admin Utama",
+    name: "admin",
     role: UserRole.ADMIN,
-    password: "Cipeng55"
+    password: "Cipeng55",
+    permissions: [
+        AdminPermission.MANAGE_TEAMS,
+        AdminPermission.MANAGE_USERS,
+        AdminPermission.MANAGE_POSTS,
+        AdminPermission.VIEW_REPORTS,
+    ]
   },
   {
     _id: new ObjectId(),

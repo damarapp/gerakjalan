@@ -1,8 +1,16 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { User, UserRole, Criterion, NewUserPayload } from '../../types';
+import { User, UserRole, Criterion, NewUserPayload, AdminPermission, UpdateUserPayload } from '../../types';
 import Card from '../../components/Card';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+
+const permissionLabels: Record<AdminPermission, string> = {
+    [AdminPermission.MANAGE_TEAMS]: 'Kelola Regu',
+    [AdminPermission.MANAGE_USERS]: 'Kelola Pengguna',
+    [AdminPermission.MANAGE_POSTS]: 'Kelola Pos',
+    [AdminPermission.VIEW_REPORTS]: 'Laporan Cetak',
+};
 
 const ManageUsers: React.FC = () => {
     const { users, posts, currentUser, addUser, updateUser, deleteUser } = useAppContext();
@@ -15,6 +23,7 @@ const ManageUsers: React.FC = () => {
     const [assignedPostId, setAssignedPostId] = useState<string | undefined>(undefined);
     const [assignedCriteriaIds, setAssignedCriteriaIds] = useState<string[]>([]);
     const [availableCriteria, setAvailableCriteria] = useState<Criterion[]>([]);
+    const [permissions, setPermissions] = useState<AdminPermission[]>([]);
 
     const openModal = (user: User | null = null) => {
         setCurrentUserToEdit(user);
@@ -25,6 +34,7 @@ const ManageUsers: React.FC = () => {
         const userPostId = user && user.role === UserRole.JUDGE ? user.assignedPostId : undefined;
         setAssignedPostId(userPostId);
         setAssignedCriteriaIds(user && user.role === UserRole.JUDGE && user.assignedCriteriaIds ? user.assignedCriteriaIds : []);
+        setPermissions(user && user.role === UserRole.ADMIN ? user.permissions || [] : []);
         setIsModalOpen(true);
     };
 
@@ -36,6 +46,13 @@ const ManageUsers: React.FC = () => {
             setAvailableCriteria([]);
         }
     }, [assignedPostId, role, posts]);
+    
+    useEffect(() => {
+        // Reset permissions when role changes to JUDGE
+        if (role === UserRole.JUDGE) {
+            setPermissions([]);
+        }
+    }, [role]);
 
     const handlePostChange = (postId: string) => {
         const newPostId = postId || undefined;
@@ -51,6 +68,14 @@ const ManageUsers: React.FC = () => {
         );
     };
 
+    const handlePermissionChange = (permission: AdminPermission) => {
+        setPermissions(prev => 
+            prev.includes(permission)
+                ? prev.filter(p => p !== permission)
+                : [...prev, permission]
+        );
+    };
+
     const closeModal = () => {
         setIsModalOpen(false);
         setCurrentUserToEdit(null);
@@ -61,7 +86,14 @@ const ManageUsers: React.FC = () => {
         setIsSubmitting(true);
         try {
             if (currentUserToEdit) {
-                const payload = { ...currentUserToEdit, name, role, assignedPostId, assignedCriteriaIds };
+                const payload: UpdateUserPayload = { 
+                    ...currentUserToEdit, 
+                    name, 
+                    role, 
+                    assignedPostId, 
+                    assignedCriteriaIds,
+                    permissions: role === UserRole.ADMIN ? permissions : [],
+                };
                 if(password && role === UserRole.ADMIN) payload.password = password;
                 await updateUser(payload);
             } else {
@@ -71,6 +103,7 @@ const ManageUsers: React.FC = () => {
                     password: role === UserRole.ADMIN ? password : undefined,
                     assignedPostId: role === UserRole.JUDGE ? assignedPostId : undefined,
                     assignedCriteriaIds: role === UserRole.JUDGE ? assignedCriteriaIds : [],
+                    permissions: role === UserRole.ADMIN ? permissions : [],
                 };
                 await addUser(payload);
             }
@@ -120,7 +153,7 @@ const ManageUsers: React.FC = () => {
                         <tr className="border-b-2 border-abu-abu">
                             <th className="p-3">Nama Pengguna</th>
                             <th className="p-3">Peran</th>
-                            <th className="p-3">Detail Penugasan</th>
+                            <th className="p-3">Detail Penugasan / Hak Akses</th>
                             <th className="p-3 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -147,6 +180,16 @@ const ManageUsers: React.FC = () => {
                                                 </ul>
                                             )}
                                         </div>
+                                    ) : user.role === UserRole.ADMIN ? (
+                                        <div>
+                                            {user.permissions && user.permissions.length > 0 ? (
+                                                <ul className='list-disc list-inside'>
+                                                    {user.permissions.map(p => (
+                                                        <li key={p}>{permissionLabels[p as AdminPermission]}</li>
+                                                    ))}
+                                                </ul>
+                                            ) : (<span className="text-gray-500">Tidak ada hak akses khusus</span>)}
+                                        </div>
                                     ) : '-'}
                                 </td>
                                 <td className="p-3 text-right">
@@ -160,13 +203,22 @@ const ManageUsers: React.FC = () => {
             </div>
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-                    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+                    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md max-h-full overflow-y-auto">
                         <h4 className="font-bold text-lg mb-4">{currentUserToEdit ? 'Edit' : 'Tambah'} Pengguna</h4>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium">Nama Pengguna</label>
                                 <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 border rounded" required />
                             </div>
+                           
+                            <div>
+                                <label className="block text-sm font-medium">Peran</label>
+                                <select value={role} onChange={e => setRole(e.target.value as UserRole)} className="w-full p-2 border rounded">
+                                    <option value={UserRole.JUDGE}>Juri</option>
+                                    <option value={UserRole.ADMIN}>Admin</option>
+                                </select>
+                            </div>
+                            
                             {role === UserRole.ADMIN && (
                                 <div>
                                     <label className="block text-sm font-medium">Password</label>
@@ -180,13 +232,7 @@ const ManageUsers: React.FC = () => {
                                     />
                                 </div>
                             )}
-                            <div>
-                                <label className="block text-sm font-medium">Peran</label>
-                                <select value={role} onChange={e => setRole(e.target.value as UserRole)} className="w-full p-2 border rounded">
-                                    <option value={UserRole.JUDGE}>Juri</option>
-                                    <option value={UserRole.ADMIN}>Admin</option>
-                                </select>
-                            </div>
+
                             {role === UserRole.JUDGE && (
                                 <>
                                 <div>
@@ -219,6 +265,29 @@ const ManageUsers: React.FC = () => {
                                 )}
                                 </>
                             )}
+                             {role === UserRole.ADMIN && currentUser?.name === 'admin' && (
+                                <div>
+                                    <label className="block text-sm font-medium">Hak Akses Admin</label>
+                                    <p className="text-xs text-gray-500 mb-2">Pilih halaman mana saja yang dapat diakses oleh admin ini.</p>
+                                    <div className="mt-2 space-y-2 p-3 border rounded-lg bg-gray-50 max-h-40 overflow-y-auto">
+                                        {Object.values(AdminPermission).map((p) => (
+                                            <div key={p} className="flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    id={`permission-${p}`}
+                                                    checked={permissions.includes(p)}
+                                                    onChange={() => handlePermissionChange(p)}
+                                                    disabled={currentUserToEdit?.name === 'admin'}
+                                                    className="h-4 w-4 rounded border-gray-300 text-merah focus:ring-merah disabled:bg-gray-200"
+                                                />
+                                                <label htmlFor={`permission-${p}`} className="ml-3 block text-sm text-gray-800 select-none cursor-pointer">
+                                                    {permissionLabels[p]}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                             )}
                             <div className="flex justify-end space-x-2 pt-2">
                                 <button type="button" onClick={closeModal} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" disabled={isSubmitting}>Batal</button>
                                 <button type="submit" className="bg-merah hover:bg-merah-tua text-white font-bold py-2 px-4 rounded" disabled={isSubmitting}>

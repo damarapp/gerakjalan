@@ -2,7 +2,7 @@
 
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { connectToDatabase } from './mongo.js';
-import { User, UserRole } from '../types.js';
+import { UserRole } from '../types.js';
 import { ObjectId } from 'mongodb';
 
 export default async (req: VercelRequest, res: VercelResponse) => {
@@ -11,23 +11,24 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     }
 
     try {
-        const { role, userId, password } = req.body;
+        const { role, userId, username, password } = req.body;
         const { db } = await connectToDatabase();
         const usersCollection = db.collection('users');
 
         let user: any | null = null;
         
-        if (role === UserRole.ADMIN) {
-            // Admin login logic: hardcoded password check
-            if (password === 'Cipeng55') {
-                 // Find an admin user to create a session for, but don't validate their DB password
-                user = await usersCollection.findOne({ role: UserRole.ADMIN });
-                if (!user) {
-                     return res.status(401).json({ message: 'Akun admin tidak ditemukan di database.' });
-                }
-            } else {
-                return res.status(401).json({ message: 'Password admin salah.' });
+        if (role === UserRole.ADMIN && username && password) {
+            // Admin login logic: Find user by username and check password
+            user = await usersCollection.findOne({ name: username, role: UserRole.ADMIN });
+
+            if (!user) {
+                return res.status(401).json({ message: 'Username atau password salah.' });
             }
+            // In a real app, passwords should be hashed. Here we do a plain text comparison.
+            if (user.password !== password) {
+                return res.status(401).json({ message: 'Username atau password salah.' });
+            }
+
         } else if (role === UserRole.JUDGE && userId) {
             // Judge login logic: No password required, just check for existence.
             if (!ObjectId.isValid(userId)) {
