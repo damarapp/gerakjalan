@@ -29,14 +29,14 @@ export default async (req: VercelRequest, res: VercelResponse) => {
                 return res.status(401).json({ message: 'Password admin salah.' });
             }
         } else if (role === UserRole.JUDGE && userId) {
-            // Judge login logic: validate against database
+            // Judge login logic: No password required, just check for existence.
             if (!ObjectId.isValid(userId)) {
-                return res.status(401).json({ message: 'Kombinasi pengguna dan password salah.' });
+                return res.status(401).json({ message: 'ID Juri tidak valid.' });
             }
             user = await usersCollection.findOne({ _id: new ObjectId(userId) });
             
-            if (!user || user.password !== password) {
-                 return res.status(401).json({ message: 'Kombinasi pengguna dan password salah.' });
+            if (!user) {
+                 return res.status(404).json({ message: 'Juri tidak ditemukan.' });
             }
         } else {
              return res.status(400).json({ message: 'Permintaan tidak valid.' });
@@ -48,8 +48,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
             const userWithId = { ...userWithoutPassword, id: user._id.toString() };
             res.status(200).json({ user: userWithId });
         } else {
-            // Generic error for judge if user is null after checks
-            res.status(401).json({ message: 'Kombinasi pengguna dan password salah.' });
+            // Generic error if user is null after checks
+            res.status(401).json({ message: 'Login gagal.' });
         }
     } catch (error) {
         console.error('API Login Error:', error);

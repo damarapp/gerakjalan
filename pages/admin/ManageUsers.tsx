@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { User, UserRole, Criterion, NewUserPayload } from '../../types';
@@ -63,13 +62,13 @@ const ManageUsers: React.FC = () => {
         try {
             if (currentUserToEdit) {
                 const payload = { ...currentUserToEdit, name, role, assignedPostId, assignedCriteriaIds };
-                if(password) payload.password = password;
+                if(password && role === UserRole.ADMIN) payload.password = password;
                 await updateUser(payload);
             } else {
                 const payload: NewUserPayload = { 
                     name, 
                     role, 
-                    password,
+                    password: role === UserRole.ADMIN ? password : undefined,
                     assignedPostId: role === UserRole.JUDGE ? assignedPostId : undefined,
                     assignedCriteriaIds: role === UserRole.JUDGE ? assignedCriteriaIds : [],
                 };
@@ -168,17 +167,19 @@ const ManageUsers: React.FC = () => {
                                 <label className="block text-sm font-medium">Nama Pengguna</label>
                                 <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 border rounded" required />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium">Password</label>
-                                <input 
-                                    type="password" 
-                                    value={password} 
-                                    onChange={e => setPassword(e.target.value)} 
-                                    className="w-full p-2 border rounded" 
-                                    placeholder={currentUserToEdit ? 'Kosongkan jika tidak diubah' : ''}
-                                    required={!currentUserToEdit} 
-                                />
-                            </div>
+                            {role === UserRole.ADMIN && (
+                                <div>
+                                    <label className="block text-sm font-medium">Password</label>
+                                    <input 
+                                        type="password" 
+                                        value={password} 
+                                        onChange={e => setPassword(e.target.value)} 
+                                        className="w-full p-2 border rounded" 
+                                        placeholder={currentUserToEdit ? 'Kosongkan jika tidak diubah' : ''}
+                                        required={!currentUserToEdit} 
+                                    />
+                                </div>
+                            )}
                             <div>
                                 <label className="block text-sm font-medium">Peran</label>
                                 <select value={role} onChange={e => setRole(e.target.value as UserRole)} className="w-full p-2 border rounded">

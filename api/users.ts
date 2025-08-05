@@ -12,8 +12,9 @@ const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<
         switch (req.method) {
             case 'POST': {
                 const newUser = req.body;
-                if (!newUser.password) {
-                    res.status(400).json({ message: "Password is required for new user."});
+                // Password is only required for new Admins
+                if (newUser.role === UserRole.ADMIN && !newUser.password) {
+                    res.status(400).json({ message: "Password is required for a new Admin user."});
                     return;
                 }
                 const result = await usersCollection.insertOne(newUser);

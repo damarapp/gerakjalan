@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { UserRole } from '../types';
@@ -26,7 +25,7 @@ const LoginPage: React.FC = () => {
         if (!userIdToLogin) {
             throw new Error("Pengguna tidak ditemukan.");
         }
-        await login(role, userIdToLogin, password);
+        await login(role, userIdToLogin, role === UserRole.ADMIN ? password : undefined);
     } catch (err: any) {
         setError(err.message || 'Login gagal. Silakan coba lagi.');
     } finally {
@@ -87,7 +86,7 @@ const LoginPage: React.FC = () => {
             </div>
           )}
 
-          {(role === UserRole.ADMIN || role === UserRole.JUDGE) && (
+          {role === UserRole.ADMIN && (
               <div>
                   <label htmlFor="password-input" className="block text-sm font-medium text-abu-abu-gelap mb-2">
                       Password
