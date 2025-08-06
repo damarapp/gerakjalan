@@ -5,12 +5,14 @@ import Card from '../components/Card';
 import { LogIn, KeyRound, LoaderCircle, User as UserIcon } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
-  const { login } = useAppContext();
+  const { login, users } = useAppContext();
   const [role, setRole] = useState<UserRole>(UserRole.JUDGE);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const judges = users.filter(user => user.role === UserRole.JUDGE).sort((a,b) => a.name.localeCompare(b.name));
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,25 +59,39 @@ const LoginPage: React.FC = () => {
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
-          <>
             <div>
-                <label htmlFor="username-input" className="block text-sm font-medium text-abu-abu-gelap mb-2">
+                <label htmlFor={role === UserRole.JUDGE ? 'judge-select' : 'username-input'} className="block text-sm font-medium text-abu-abu-gelap mb-2">
                     Nama Pengguna
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                       <UserIcon className="h-5 w-5 text-gray-400" />
                   </span>
-                  <input
-                      type="text"
-                      id="username-input"
-                      value={username}
-                      onChange={e => setUsername(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-merah focus:border-merah"
-                      required
-                      placeholder={role === UserRole.JUDGE ? "Masukkan nama pengguna juri" : "Masukkan username admin"}
-                      autoComplete="username"
-                  />
+                  {role === UserRole.JUDGE ? (
+                     <select
+                        id="judge-select"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-merah focus:border-merah appearance-none"
+                        required
+                      >
+                        <option value="" disabled>Pilih nama juri</option>
+                        {judges.map(judge => (
+                           <option key={judge.id} value={judge.name}>{judge.name}</option>
+                        ))}
+                      </select>
+                  ) : (
+                     <input
+                        type="text"
+                        id="username-input"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-merah focus:border-merah"
+                        required
+                        placeholder="Masukkan username admin"
+                        autoComplete="username"
+                    />
+                  )}
                 </div>
             </div>
             <div>
@@ -98,7 +114,6 @@ const LoginPage: React.FC = () => {
                   />
                 </div>
             </div>
-          </>
           
           {error && <p className="text-merah text-sm text-center">{error}</p>}
 
