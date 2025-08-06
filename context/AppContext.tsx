@@ -160,14 +160,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         fetchData();
     }, [fetchData]);
 
-    const login = useCallback(async (role: UserRole, identifier: string, password?: string) => {
-        const payload: any = { role };
-        if (role === UserRole.ADMIN) {
-            payload.username = identifier;
-            payload.password = password;
-        } else { // Judge
-            payload.userId = identifier;
-        }
+    const login = useCallback(async (role: UserRole, username: string, password?: string) => {
+        const payload = {
+            role,
+            username,
+            password,
+        };
 
         const { user } = await apiCall('/api/login', {
             method: 'POST',

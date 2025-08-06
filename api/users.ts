@@ -1,4 +1,5 @@
 
+
 import { VercelResponse } from '@vercel/node';
 import { connectToDatabase } from './mongo.js';
 import { ObjectId } from 'mongodb';
@@ -13,9 +14,9 @@ const handler = async (req: AuthenticatedRequest, res: VercelResponse): Promise<
         switch (req.method) {
             case 'POST': {
                 const newUser = req.body;
-                // Password is only required for new Admins
-                if (newUser.role === UserRole.ADMIN && !newUser.password) {
-                    res.status(400).json({ message: "Password is required for a new Admin user."});
+                // Password is now required for all new users.
+                if (!newUser.password) {
+                    res.status(400).json({ message: "Password is required for a new user."});
                     return;
                 }
                 

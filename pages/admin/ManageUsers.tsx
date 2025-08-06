@@ -100,13 +100,13 @@ const ManageUsers: React.FC = () => {
                     permissions: role === UserRole.ADMIN ? permissions : [],
                     isRovingJudge: role === UserRole.JUDGE ? isRovingJudge : false,
                 };
-                if(password && role === UserRole.ADMIN) payload.password = password;
+                if(password) payload.password = password;
                 await updateUser(payload);
             } else {
                 const payload: NewUserPayload = { 
                     name, 
                     role, 
-                    password: role === UserRole.ADMIN ? password : undefined,
+                    password,
                     assignedPostId: role === UserRole.JUDGE ? assignedPostId : undefined,
                     assignedCriteriaIds: role === UserRole.JUDGE ? assignedCriteriaIds : [],
                     permissions: role === UserRole.ADMIN ? permissions : [],
@@ -252,19 +252,17 @@ const ManageUsers: React.FC = () => {
                                 </select>
                             </div>
                             
-                            {role === UserRole.ADMIN && (
-                                <div>
-                                    <label className="block text-sm font-medium">Password</label>
-                                    <input 
-                                        type="password" 
-                                        value={password} 
-                                        onChange={e => setPassword(e.target.value)} 
-                                        className="w-full p-2 border rounded" 
-                                        placeholder={currentUserToEdit ? 'Kosongkan jika tidak diubah' : ''}
-                                        required={!currentUserToEdit} 
-                                    />
-                                </div>
-                            )}
+                            <div>
+                                <label className="block text-sm font-medium">Password</label>
+                                <input 
+                                    type="password" 
+                                    value={password} 
+                                    onChange={e => setPassword(e.target.value)} 
+                                    className="w-full p-2 border rounded" 
+                                    placeholder={currentUserToEdit ? 'Kosongkan jika tidak diubah' : ''}
+                                    required={!currentUserToEdit} 
+                                />
+                            </div>
 
                             {role === UserRole.JUDGE && (
                                 <>

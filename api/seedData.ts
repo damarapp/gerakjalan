@@ -1,4 +1,5 @@
 
+
 import { ObjectId } from 'mongodb';
 import { UserRole, AdminPermission } from '../types.js';
 
@@ -28,6 +29,7 @@ export const initialUsers = [
     _id: new ObjectId(),
     name: "Ahmad Fauzi",
     role: UserRole.JUDGE,
+    password: "juri",
     assignedPostId: post1Id,
     assignedCriteriaIds: ["c1", "c2"],
     isRovingJudge: false,
@@ -36,6 +38,7 @@ export const initialUsers = [
     _id: new ObjectId(),
     name: "Siti Aminah",
     role: UserRole.JUDGE,
+    password: "juri",
     assignedPostId: post2Id,
     assignedCriteriaIds: ["c3", "c4"],
     isRovingJudge: false,
@@ -44,6 +47,7 @@ export const initialUsers = [
     _id: new ObjectId(),
     name: "Budi Santoso",
     role: UserRole.JUDGE,
+    password: "juri",
     assignedPostId: post3Id,
     assignedCriteriaIds: ["c5", "c6"],
     isRovingJudge: false,
@@ -52,6 +56,7 @@ export const initialUsers = [
     _id: new ObjectId(),
     name: "Rina Marlina",
     role: UserRole.JUDGE,
+    password: "juri",
     assignedPostId: post1Id,
     assignedCriteriaIds: ["c1", "c2"],
     isRovingJudge: false,
@@ -60,6 +65,7 @@ export const initialUsers = [
     _id: new ObjectId(),
     name: "Juri Keliling 1",
     role: UserRole.JUDGE,
+    password: "juri",
     assignedPostId: post2Id, // Can be assigned to any post
     assignedCriteriaIds: ["c3", "c4"], // Can use any criteria
     isRovingJudge: true,
