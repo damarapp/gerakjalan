@@ -115,7 +115,7 @@ const JudgePortal: React.FC = () => {
   }
   
   const filteredTeams = teams
-    .filter(team => team.name.toLowerCase().includes(searchTerm.toLowerCase()) || team.number.includes(searchTerm))
+    .filter(team => team.number.includes(searchTerm))
     .sort((a,b) => a.number.localeCompare(b.number));
 
   const renderButtonContent = (teamId: string) => {
@@ -156,7 +156,7 @@ const JudgePortal: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
                 <input 
                     type="search"
-                    placeholder="Cari No. atau Nama Regu..."
+                    placeholder="Cari Nomor Regu..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     className="w-full sm:w-64 p-2 pl-10 border border-gray-300 rounded-lg shadow-sm focus:ring-merah focus:border-merah"
@@ -172,7 +172,7 @@ const JudgePortal: React.FC = () => {
                 <form onSubmit={(e) => { e.preventDefault(); handleSave(team.id); }} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                    
                     <div className="md:col-span-3">
-                        <p className="font-bold text-lg text-merah">{team.number} - {team.name}</p>
+                        <p className="font-bold text-lg text-merah">No. Regu: {team.number}</p>
                         <p className="text-sm text-gray-500">{team.level} - {team.gender}</p>
                     </div>
 
@@ -205,7 +205,7 @@ const JudgePortal: React.FC = () => {
                                 saveStatus[team.id] === 'saving' ? 'bg-gray-400 text-white' :
                                 'bg-merah hover:bg-merah-tua text-putih'
                             }`}
-                            aria-label={`Simpan nilai untuk ${team.name}`}
+                            aria-label={`Simpan nilai untuk Regu Nomor ${team.number}`}
                         >
                            {renderButtonContent(team.id)}
                         </button>
