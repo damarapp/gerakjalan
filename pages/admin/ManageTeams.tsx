@@ -132,6 +132,7 @@ const ManageTeams: React.FC = () => {
                 <table className="w-full text-left">
                     <thead>
                         <tr className="border-b-2 border-abu-abu">
+                            <th className="p-3 w-12 text-center">No.</th>
                             <th className="p-3">No. Urut</th>
                             <th className="p-3">Nama Regu</th>
                             <th className="p-3">Jenis</th>
@@ -139,8 +140,9 @@ const ManageTeams: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredTeams.length > 0 ? filteredTeams.map(team => (
+                        {filteredTeams.length > 0 ? filteredTeams.map((team, index) => (
                             <tr key={team.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                                <td className="p-3 text-center">{index + 1}</td>
                                 <td className="p-3">{team.number}</td>
                                 <td className="p-3 font-semibold">{team.name}</td>
                                 <td className="p-3">{team.gender}</td>
@@ -151,7 +153,7 @@ const ManageTeams: React.FC = () => {
                             </tr>
                         )) : (
                            <tr>
-                               <td colSpan={4} className="text-center p-8 text-gray-500 no-print">
+                               <td colSpan={5} className="text-center p-8 text-gray-500 no-print">
                                    Belum ada regu untuk kategori {activeTab}.
                                </td>
                            </tr>
