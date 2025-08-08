@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { Team, TeamLevel, TeamGender, NewTeamPayload } from '../../types';
 import Card from '../../components/Card';
@@ -20,22 +20,69 @@ const ManageTeams: React.FC = () => {
 
     const openModal = (team: Team | null = null) => {
         setCurrentTeam(team);
-        setName(team ? team.name : '');
-        setLevel(team ? team.level : activeTab);
-        setGender(team ? team.gender : TeamGender.PUTRA);
-
         if (team) {
+            // Editing existing team
+            setName(team.name);
             setNumber(team.number);
+            setLevel(team.level);
+            setGender(team.gender);
         } else {
-            const teamsInLevel = teams.filter(t => t.level === activeTab);
-            const highestNumber = teamsInLevel.reduce((max, t) => {
-                const num = parseInt(t.number, 10);
-                return isNaN(num) ? max : Math.max(max, num);
-            }, 0);
-            setNumber((highestNumber + 1).toString().padStart(3, '0'));
+            // Adding new team
+            setName('');
+            setLevel(activeTab); // Set level from the active tab
+            setGender(TeamGender.PUTRA); // Default to Putra, useEffect will calculate number
+            setNumber(''); // Clear number, useEffect will populate it
         }
         setIsModalOpen(true);
     };
+
+    useEffect(() => {
+        // This effect automatically calculates the next team number when adding a new team.
+        if (!isModalOpen || currentTeam) return;
+
+        const prefixMap: Record<TeamLevel, string> = {
+            [TeamLevel.SD]: '1',
+            [TeamLevel.SMP]: '2',
+            [TeamLevel.SMA]: '2',
+            [TeamLevel.UMUM]: '3',
+        };
+        const prefix = prefixMap[level];
+        const isPutra = gender === TeamGender.PUTRA;
+
+        const relevantTeams = teams.filter(t => t.level === level && t.gender === gender);
+        
+        let highestNumber = 0;
+        relevantTeams.forEach(t => {
+            const num = parseInt(t.number, 10);
+            if (!isNaN(num) && t.number.startsWith(prefix) && num > highestNumber) {
+                highestNumber = num;
+            }
+        });
+
+        let nextNumberStr = '';
+        if (highestNumber > 0) {
+            nextNumberStr = (highestNumber + 2).toString();
+        } else {
+            // No teams found, determine starting number based on level and gender
+            switch (level) {
+                case TeamLevel.SD:
+                    nextNumberStr = isPutra ? '101' : '102';
+                    break;
+                case TeamLevel.SMP:
+                case TeamLevel.SMA:
+                    nextNumberStr = isPutra ? '201' : '202';
+                    break;
+                case TeamLevel.UMUM:
+                    nextNumberStr = isPutra ? '301' : '302';
+                    break;
+                default:
+                    // Fallback, though should not be reached
+                    nextNumberStr = '000';
+            }
+        }
+        setNumber(nextNumberStr);
+
+    }, [isModalOpen, currentTeam, level, gender, teams]);
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -171,21 +218,23 @@ const ManageTeams: React.FC = () => {
                                 <select value={level} onChange={e => setLevel(e.target.value as TeamLevel)} className="w-full p-2 border rounded bg-gray-100" disabled>
                                     {Object.values(TeamLevel).map(l => <option key={l} value={l}>{l}</option>)}
                                 </select>
-                                <p className="text-xs text-gray-500 mt-1">Jenjang diatur berdasarkan tab yang aktif. Untuk mengubah, hapus dan buat ulang dari tab yang benar.</p>
+                                <p className="text-xs text-gray-500 mt-1">Jenjang diatur berdasarkan tab yang aktif. Untuk mengubah, buat regu baru dari tab yang benar.</p>
                             </div>
                             <div>
+                                <label className="block text-sm font-medium">Jenis</label>
+                                <select value={gender} onChange={e => setGender(e.target.value as TeamGender)} className="w-full p-2 border rounded" disabled={!!currentTeam}>
+                                    {Object.values(TeamGender).map(g => <option key={g} value={g}>{g}</option>)}
+                                </select>
+                                {!!currentTeam && <p className="text-xs text-gray-500 mt-1">Jenis tidak dapat diubah untuk menjaga konsistensi nomor urut.</p>}
+                            </div>
+                             <div>
                                 <label className="block text-sm font-medium">Nomor Urut</label>
                                 <input type="text" value={number} onChange={e => setNumber(e.target.value)} className="w-full p-2 border rounded" required />
+                                 <p className="text-xs text-gray-500 mt-1">Nomor urut disarankan secara otomatis. Anda dapat mengubahnya jika perlu.</p>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium">Nama Regu</label>
                                 <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 border rounded" required />
-                            </div>
-                             <div>
-                                <label className="block text-sm font-medium">Jenis</label>
-                                <select value={gender} onChange={e => setGender(e.target.value as TeamGender)} className="w-full p-2 border rounded">
-                                    {Object.values(TeamGender).map(g => <option key={g} value={g}>{g}</option>)}
-                                </select>
                             </div>
                             <div className="flex justify-end space-x-2 pt-2">
                                 <button type="button" onClick={closeModal} className="bg-gray-300 py-2 px-4 rounded" disabled={isSubmitting}>Batal</button>
