@@ -37,50 +37,46 @@ const ManageTeams: React.FC = () => {
     };
 
     useEffect(() => {
-        // This effect automatically calculates the next team number when adding a new team.
+        // This effect automatically calculates the next available team number, filling gaps.
         if (!isModalOpen || currentTeam) return;
 
-        const prefixMap: Record<TeamLevel, string> = {
-            [TeamLevel.SD]: '1',
-            [TeamLevel.SMP]: '2',
-            [TeamLevel.SMA]: '2',
-            [TeamLevel.UMUM]: '3',
-        };
-        const prefix = prefixMap[level];
         const isPutra = gender === TeamGender.PUTRA;
 
-        const relevantTeams = teams.filter(t => t.level === level && t.gender === gender);
-        
-        let highestNumber = 0;
-        relevantTeams.forEach(t => {
-            const num = parseInt(t.number, 10);
-            if (!isNaN(num) && t.number.startsWith(prefix) && num > highestNumber) {
-                highestNumber = num;
-            }
-        });
+        // 1. Get existing numbers for the specific category into a Set for fast lookups
+        const existingNumbers = new Set(
+            teams
+                .filter(t => t.level === level && t.gender === gender)
+                .map(t => t.number)
+        );
 
-        let nextNumberStr = '';
-        if (highestNumber > 0) {
-            nextNumberStr = (highestNumber + 2).toString();
-        } else {
-            // No teams found, determine starting number based on level and gender
-            switch (level) {
-                case TeamLevel.SD:
-                    nextNumberStr = isPutra ? '101' : '102';
-                    break;
-                case TeamLevel.SMP:
-                case TeamLevel.SMA:
-                    nextNumberStr = isPutra ? '201' : '202';
-                    break;
-                case TeamLevel.UMUM:
-                    nextNumberStr = isPutra ? '301' : '302';
-                    break;
-                default:
-                    // Fallback, though should not be reached
-                    nextNumberStr = '000';
-            }
+        // 2. Determine the starting number for the search loop based on level and gender
+        let startNumber = 0;
+        switch (level) {
+            case TeamLevel.SD:
+                startNumber = isPutra ? 101 : 102;
+                break;
+            case TeamLevel.SMP:
+            case TeamLevel.SMA:
+                startNumber = isPutra ? 201 : 202;
+                break;
+            case TeamLevel.UMUM:
+                startNumber = isPutra ? 301 : 302;
+                break;
         }
-        setNumber(nextNumberStr);
+
+        // 3. Find the first available gap by checking numbers in sequence
+        let nextAvailableNumber = startNumber;
+        const maxIterations = 1000; // Safety limit to prevent potential infinite loops
+        for (let i = 0; i < maxIterations; i++) {
+            if (!existingNumbers.has(nextAvailableNumber.toString())) {
+                // Found an unused number (a gap). This is our number.
+                break;
+            }
+            // This number is taken, try the next valid one (the next odd or even number)
+            nextAvailableNumber += 2;
+        }
+        
+        setNumber(nextAvailableNumber.toString());
 
     }, [isModalOpen, currentTeam, level, gender, teams]);
 
