@@ -100,7 +100,7 @@ const ReportPage: React.FC = () => {
                                             {postOrder.map(postId => {
                                                 const group = groupedJudgesByPost[postId];
                                                 return (
-                                                    <th key={postId} colSpan={group.judges.length} className="p-2 border text-center">
+                                                    <th key={postId} colSpan={group.judges.length} className="p-2 border text-center font-bold bg-gray-200">
                                                         {group.postName}
                                                     </th>
                                                 );
