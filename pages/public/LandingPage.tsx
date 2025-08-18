@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import * as ReactRouterDOM from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
 import { TeamLevel, TeamGender, TeamTotalScore } from '../../types';
 import Card from '../../components/Card';
 import Header from '../../components/Header';
 import { Trophy, Award, Medal } from 'lucide-react';
+
+const { Link } = ReactRouterDOM;
 
 const LandingPage: React.FC = () => {
     const { calculateScores, scores, teams } = useAppContext();

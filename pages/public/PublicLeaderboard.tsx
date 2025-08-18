@@ -3,7 +3,9 @@ import { useAppContext } from '../../context/AppContext';
 import Card from '../../components/Card';
 import { Trophy, Award, Medal, Home, LogIn } from 'lucide-react';
 import { TeamTotalScore, TeamLevel, TeamGender } from '../../types';
-import { Link } from 'react-router-dom';
+import * as ReactRouterDOM from 'react-router-dom';
+
+const { Link } = ReactRouterDOM;
 
 const PublicLeaderboard: React.FC = () => {
   const { calculateScores, scores, teams } = useAppContext();

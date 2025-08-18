@@ -1,6 +1,5 @@
-
 import React, { ReactNode } from 'react';
-import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import * as ReactRouterDOM from 'react-router-dom';
 import { useAppContext } from './context/AppContext';
 import { UserRole, AdminPermission } from './types';
 import { LoaderCircle } from 'lucide-react';
@@ -15,6 +14,8 @@ import ReportPage from './pages/admin/ReportPage';
 import JudgePortal from './pages/judge/JudgePortal';
 import PublicLeaderboard from './pages/public/PublicLeaderboard';
 import LandingPage from './pages/public/LandingPage';
+
+const { HashRouter, Routes, Route, Navigate, Outlet } = ReactRouterDOM;
 
 // Component to protect admin routes based on specific permissions
 const AdminRouteGuard = ({ children, requiredPermission }: { children: ReactNode, requiredPermission: AdminPermission }) => {
@@ -69,7 +70,14 @@ const App: React.FC = () => {
       <HashRouter>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<LandingPage />} />
+          <Route 
+            path="/" 
+            element={
+              currentUser && currentUser.role === UserRole.JUDGE 
+              ? <Navigate to="/judge" replace /> 
+              : <LandingPage />
+            } 
+          />
           <Route path="/leaderboard" element={<PublicLeaderboard />} />
 
           {/* Conditional Login Route */}

@@ -1,11 +1,12 @@
-
 import React, { useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import * as ReactRouterDOM from 'react-router-dom';
 import Card from '../../components/Card';
 import { Users, UserCheck, MapPin, BarChart2, ShieldCheck, FileText, AlertTriangle, Trash2, LoaderCircle } from 'lucide-react';
 import Leaderboard from './Leaderboard';
 import { useAppContext } from '../../context/AppContext';
 import { AdminPermission } from '../../types';
+
+const { NavLink, Outlet, useLocation } = ReactRouterDOM;
 
 const AdminDashboard: React.FC = () => {
     const location = useLocation();

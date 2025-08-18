@@ -1,8 +1,9 @@
-
 import React from 'react';
-import { Link } from 'react-router-dom';
+import * as ReactRouterDOM from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { LogIn, LogOut, Crown } from 'lucide-react';
+
+const { Link } = ReactRouterDOM;
 
 const Header: React.FC = () => {
   const { currentUser, logout } = useAppContext();
